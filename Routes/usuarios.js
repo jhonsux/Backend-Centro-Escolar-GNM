@@ -23,27 +23,26 @@ router.get('/usuarios', verifyToken, (req, res) => {
 
 // Ruta para consultar Usuario con ID
 router.get('/usuarios/:id', (req, res) => {
+    const { id } = req.params;
 
-    const { id } = req.params
+    // Query para seleccionar el usuario por ID, usando parámetros preparados para evitar inyección SQL
+    const query = `SELECT * FROM Usuarios WHERE user_id = ?`;
 
-    const query = `SELECT *
-    FROM Usuarios 
-    WHERE user_id = '${id}'`
-
-    pool.query(query, (error, results) => {
+    // Ejecutar la consulta usando el pool
+    pool.query(query, [id], (error, results) => {
         if (error) {
             console.error('Error en la consulta SQL:', error);
             return res.status(500).send('Error en la consulta SQL');
         }
-        if (results.length > 0) { // Verifica si hay resultados
-            res.status(200).json(results); 
+
+        // Verificar si hay resultados
+        if (results.length > 0) {
+            res.status(200).json(results);
         } else {
-            res.status(404).json({
-                message: 'No existe usuario con ese ID'
-            });
+            res.status(404).json({ message: 'No existe usuario con ese ID' });
         }
     });
-})
+});
 
 //ruta para actualizar usuario por ID
 // router.put('/usuarios/actualizar/:id',verifyToken, (req, res) => {
