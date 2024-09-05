@@ -16,7 +16,7 @@ router.get('/usuarios', verifyToken, (req, res) => {
             console.error('Error en la consulta SQL:', error);
             return res.status(500).send('Error en la consulta SQL');
         }
-        res.status(201).json(results);
+        res.status(200).json(results);
     });
 })
 
