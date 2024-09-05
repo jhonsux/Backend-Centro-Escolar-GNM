@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const verifyToken = require('../middlewares/verifyToken');
-const connection = require('/Proyecto_Escuela/db');
+const connection = require('../db');
 
 // Ruta para obtener registro de tutores
 router.get('/tutores', (req, res) => {
