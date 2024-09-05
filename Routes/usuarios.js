@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const verifyToken = require('../middlewares/verifyToken');
 const connection = require('../db');
+const pool = require('../db');
 require('dotenv').config();
 
 // Ruta para consultar Usuarios
@@ -29,7 +30,7 @@ router.get('/usuarios/:id', (req, res) => {
     FROM Usuarios 
     WHERE user_id = '${id}'`
 
-    connection.query(query, (error, results) => {
+    pool.query(query, (error, results) => {
         if (error) {
             console.error('Error en la consulta SQL:', error);
             return res.status(500).send('Error en la consulta SQL');
