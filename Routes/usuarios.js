@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const verifyToken = require('../middlewares/verifyToken');
-const connection = require('/Proyecto_Escuela/db');
+const connection = require('../db');
 require('dotenv').config();
 
 // Ruta para consultar Usuarios
