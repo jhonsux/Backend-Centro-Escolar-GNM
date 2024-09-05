@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 // const bcrypt = require('bcrypt');
 const bcrypt = require('bcryptjs');
 const connection = require('../db');
+const pool = require('../db');
 require('dotenv').config();
 
 // Ruta para iniciar sesión
@@ -56,36 +57,76 @@ router.post('/login', (req, res) => {
     });
 });
 
-// Ruta para registrar un nuevo usuario
+// // Ruta para registrar un nuevo usuario
+// router.post('/register', async (req, res) => {
+//     const { 
+//         user_id, 
+//         name, 
+//         firstname, 
+//         lastname ,
+//         email, 
+//         password, 
+//         user_types } = req.body;
+
+//     if (!email || !password) {
+//         return res.status(400).json({ message: 'Por favor, proporcione un correo valido y una contraseña' });
+//     }
+
+//     try {
+//         const hashedPassword = await bcrypt.hash(password, 10);
+//         const query = `INSERT INTO Usuarios (user_id, name, firstname, lastname, email, password, user_types)
+//         VALUES (?, ?, ?, ?, ?, ?, ?)`;
+
+//         connection.query(query, [user_id, name, firstname, lastname, email, hashedPassword, user_types], (err, results) => {
+//             if (err) {
+//                 console.error(`Error en la consulta SQL: ${err.message}`);
+//                 return res.status(500).json({ error: err.message });
+//             }
+//             res.status(201).json({ message: 'Usuario registrado exitosamente' });
+//         });
+//     } catch (err) {
+//         console.error(`Error al hashear la contraseña: ${err.message}`);
+//         res.status(500).json({ error: err.message });
+//     }
+// });
+
+
 router.post('/register', async (req, res) => {
     const { 
         user_id, 
         name, 
         firstname, 
-        lastname ,
+        lastname, 
         email, 
         password, 
-        user_types } = req.body;
+        user_types 
+    } = req.body;
 
     if (!email || !password) {
-        return res.status(400).json({ message: 'Por favor, proporcione un correo valido y una contraseña' });
+        return res.status(400).json({ message: 'Por favor, proporcione un correo válido y una contraseña' });
     }
 
     try {
+        // Hashear la contraseña
         const hashedPassword = await bcrypt.hash(password, 10);
-        const query = `INSERT INTO Usuarios (user_id, name, firstname, lastname, email, password, user_types)
-        VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
-        connection.query(query, [user_id, name, firstname, lastname, email, hashedPassword, user_types], (err, results) => {
+        // Query para insertar un nuevo usuario
+        const query = `INSERT INTO Usuarios (user_id, name, firstname, lastname, email, password, user_types)
+                       VALUES (?, ?, ?, ?, ?, ?, ?)`;
+
+        // Usar el pool para realizar la consulta
+        pool.query(query, [user_id, name, firstname, lastname, email, hashedPassword, user_types], (err, results) => {
             if (err) {
                 console.error(`Error en la consulta SQL: ${err.message}`);
-                return res.status(500).json({ error: err.message });
+                return res.status(500).json({ error: 'Error al registrar el usuario' });
             }
+
+            // Devolver un mensaje de éxito
             res.status(201).json({ message: 'Usuario registrado exitosamente' });
         });
     } catch (err) {
         console.error(`Error al hashear la contraseña: ${err.message}`);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: 'Error interno al registrar el usuario' });
     }
 });
 
