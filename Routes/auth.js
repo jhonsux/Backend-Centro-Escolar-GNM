@@ -102,6 +102,9 @@ router.post('/register', async (req, res) => {
         user_types 
     } = req.body;
 
+    const fullQuery = pool.format(query, [user_id, name, firstname, lastname, email, hashedPassword, user_types]);
+console.log('Consulta SQL completa:', fullQuery);
+
     if (!email || !password) {
         return res.status(400).json({ message: 'Por favor, proporcione un correo válido y una contraseña' });
     }
