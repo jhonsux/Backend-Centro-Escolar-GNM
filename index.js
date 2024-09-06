@@ -5,6 +5,7 @@ app.use(cors());
 const morgan = require('morgan');
 app.use(morgan('dev'));
 
+import { PORT } from './config';
 
 //const routes = require('./routes');
 const alumnosRoutes = require('./Routes/alumnos');
@@ -35,7 +36,6 @@ app.use('/ciclos',ciclosRoutes);
 app.use(dataBase);
 app.use('/comunicados',comunicadosRoutes);
 
-const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor en ejecución en el puerto ${PORT}`);
 });
