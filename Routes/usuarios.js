@@ -7,7 +7,7 @@ const pool = require('../db');
 require('dotenv').config();
 
 // Ruta para consultar Usuarios
-router.get('/usuarios', verifyToken, (req, res) => {
+router.get('/usuarios', (req, res) => {
 
     const query = `SELECT *
     FROM Usuarios`
@@ -19,6 +19,10 @@ router.get('/usuarios', verifyToken, (req, res) => {
         }
         res.status(200).json(results);
     });
+})
+
+router.get('/ping', (req, res) => {
+    res.send(' ping has result')
 })
 
 // Ruta para consultar Usuario con ID
@@ -44,38 +48,6 @@ router.get('/usuarios/:id', (req, res) => {
     });
 });
 
-//ruta para actualizar usuario por ID
-// router.put('/usuarios/actualizar/:id',verifyToken, (req, res) => {
-
-//     const { id } = req.params
-
-//     const { name, firstname, lastname, username, password, user_types} = req.body;
-
-//     if (
-//         name === undefined || 
-//         firstname === undefined || 
-//         lastname === undefined || 
-//         username === undefined ||
-//         password === undefined ||
-//         user_types === undefined
-//     ) {
-//         return res.status(400).send('Los campos son requeridos');
-//     }
-
-//     const query = `UPDATE Usuarios SET name = '${name}', firstname = '${firstname}', lastname = '${lastname}', username = '${username}', password = '${password}', user_types = '${user_types}'
-//     WHERE user_id = '${id}'`
-
-//     connection.query(query, (error, results) => {
-//         if (error) {
-//             console.error('Error en la consulta SQL:', error);
-//             return res.status(500).send('Error en la consulta SQL');
-//         }
-//         res.status(201).json({
-//             message: 'Usuario se actualizo correctamente',
-//             data: results
-//         })
-//     });
-// })
 
 
 // router.put('/usuarios/actualizar/:id',verifyToken, (req, res) => {
