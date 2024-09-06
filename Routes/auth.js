@@ -102,8 +102,6 @@ router.post('/register', async (req, res) => {
         user_types 
     } = req.body;
 
-    const fullQuery = pool.format(query, [user_id, name, firstname, lastname, email, hashedPassword, user_types]);
-console.log('Consulta SQL completa:', fullQuery);
 
     if (!email || !password) {
         return res.status(400).json({ message: 'Por favor, proporcione un correo válido y una contraseña' });
@@ -124,10 +122,12 @@ console.log('Consulta SQL completa:', fullQuery);
             user_types
         });
 
+       
         // Query para insertar un nuevo usuario
         const query = `INSERT INTO Usuarios (user_id, name, firstname, lastname, email, password, user_types)
                        VALUES (?, ?, ?, ?, ?, ?, ?)`;
-
+ const fullQuery = pool.format(query, [user_id, name, firstname, lastname, email, hashedPassword, user_types]);
+        console.log('Consulta SQL completa:', fullQuery);
         // Ejecutar la consulta usando el pool
         pool.query(query, [user_id, name, firstname, lastname, email, hashedPassword, user_types], (err, results) => {
             if (err) {
