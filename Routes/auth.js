@@ -134,7 +134,7 @@ router.post('/register', async (req, res) => {
                     code: err.code,
                     errno: err.errno,
                 });
-                return res.status(500).json({ error: 'Error al registrar el usuario' });
+                return res.status(500).json({ error: 'Error al registrar el usuario', err });
             }
 
             // Devolver un mensaje de éxito
