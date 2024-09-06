@@ -110,15 +110,31 @@ router.post('/register', async (req, res) => {
         // Hashear la contraseña
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        // Log de los datos que se van a insertar
+        console.log('Datos que se van a insertar:', {
+            user_id,
+            name,
+            firstname,
+            lastname,
+            email,
+            hashedPassword,
+            user_types
+        });
+
         // Query para insertar un nuevo usuario
         const query = `INSERT INTO Usuarios (user_id, name, firstname, lastname, email, password, user_types)
                        VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
-        // Usar el pool para realizar la consulta
+        // Ejecutar la consulta usando el pool
         pool.query(query, [user_id, name, firstname, lastname, email, hashedPassword, user_types], (err, results) => {
             if (err) {
-                console.error(`Error en la consulta SQL: ${err.message}`);
-                return res.status(500).json({ error: 'Error al registrar el usuario', err });
+                console.error('Error en la consulta SQL:', {
+                    message: err.message,
+                    sqlState: err.sqlState,
+                    code: err.code,
+                    errno: err.errno,
+                });
+                return res.status(500).json({ error: 'Error al registrar el usuario' });
             }
 
             // Devolver un mensaje de éxito
