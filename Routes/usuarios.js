@@ -6,20 +6,20 @@ const connection = require('../db');
 const pool = require('../db');
 require('dotenv').config();
 
-// Ruta para consultar Usuarios
+// Ruta para consultar todos los usuarios
 router.get('/usuarios', (req, res) => {
 
-    const query = `SELECT *
-    FROM Usuarios`
+    const query = `SELECT * FROM Usuarios`;
 
-    connection.query(query, (error, results) => {
+    // Ejecutar la consulta usando el pool
+    pool.query(query, (error, results) => {
         if (error) {
             console.error('Error en la consulta SQL:', error);
             return res.status(500).send('Error en la consulta SQL');
         }
         res.status(200).json(results);
     });
-})
+});
 
 router.get('/ping', (req, res) => {
     res.send(' ping has result')
