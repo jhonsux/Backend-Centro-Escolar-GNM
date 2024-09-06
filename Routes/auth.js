@@ -118,7 +118,7 @@ router.post('/register', async (req, res) => {
         pool.query(query, [user_id, name, firstname, lastname, email, hashedPassword, user_types], (err, results) => {
             if (err) {
                 console.error(`Error en la consulta SQL: ${err.message}`);
-                return res.status(500).json({ error: 'Error al registrar el usuario' });
+                return res.status(500).json({ error: 'Error al registrar el usuario', err });
             }
 
             // Devolver un mensaje de éxito
