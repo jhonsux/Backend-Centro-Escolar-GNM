@@ -1,20 +1,20 @@
 
 // config.js
-const DB_HOST = process.env.DB_HOST || '';
-const DB_USER = process.env.DB_USER || '';
-const DB_PASSWORD = process.env.DB_PASSWORD || '';
-const DB_NAME = process.env.DB_NAME || '';
+const MYSQLHOST = process.env.MYSQLHOST || 'localhost';
+const DB_USER = process.env.DB_USER || 'root';
+const DB_PASSWORD = process.env.DB_PASSWORD || 'jhon';
+const DB_NAME = process.env.DB_NAME || 'Centro_escolar';
 const DB_PORT = process.env.DB_PORT || 3306;
 
 module.exports = {
-    DB_HOST,
+    MYSQLHOST,
     DB_USER,
     DB_PASSWORD,
     DB_NAME,
     DB_PORT
 };
 
-console.log('DB_HOST:', DB_HOST);
+console.log('DB_HOST:', MYSQLHOST);
 console.log('DB_USER:', DB_USER);
 console.log('DB_PASSWORD:', DB_PASSWORD);
 console.log('DB_NAME:', DB_NAME);
