@@ -13,3 +13,9 @@ module.exports = {
     DB_NAME,
     DB_PORT
 };
+
+console.log('DB_HOST:', DB_HOST);
+console.log('DB_USER:', DB_USER);
+console.log('DB_PASSWORD:', DB_PASSWORD);
+console.log('DB_NAME:', DB_NAME);
+console.log('DB_PORT:', DB_PORT);
