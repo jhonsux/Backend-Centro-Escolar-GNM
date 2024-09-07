@@ -1,6 +1,6 @@
 //mysql://root:NqUZGHYxcQhseahmOKCFTuhfpKgVGSHr@autorack.proxy.rlwy.net:51150/railway
 // config.js
-const MYSQLHOST = process.env.DB_HOST || 'localhost';
+const DB_HOST = process.env.DB_HOST || 'localhost';
 const DB_USER = process.env.DB_USER || 'root';
 const DB_PASSWORD = process.env.DB_PASSWORD || 'jhon';
 const DB_NAME = process.env.DB_NAME || 'Centro_escolar';
