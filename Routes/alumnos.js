@@ -8,11 +8,11 @@ require('dotenv').config();
 
 // Ruta para obtener todos los registros de Alumnos
 router.get('/', verifyToken, (req, res) => {
-    const query = `SELECT alumnos.student_id, alumnos.name, alumnos.firstname, alumnos.lastname, alumnos.sex, alumnos.status, alumnos.group_id, 
-    semestres.semester AS semestre, alumnos.parent_id
+    const query = `SELECT Alumnos.student_id, Alumnos.name, Alumnos.firstname, Alumnos.lastname, Alumnos.sex, Alumnos.status, Alumnos.group_id, 
+    Semestres.semester AS semestre, Alumnos.parent_id
                    FROM Alumnos 
-                   JOIN semestres ON alumnos.semester_id = semestres.semester_id
-                   ORDER BY alumnos.group_id`;
+                   JOIN Semestres ON Alumnos.semester_id = Semestres.semester_id
+                   ORDER BY Alumnos.group_id`;
 
     // Usando pool en lugar de connection
     pool.query(query, (error, results) => {
@@ -28,7 +28,7 @@ router.get('/', verifyToken, (req, res) => {
     });
 });
 
-// Ruta para buscar alumnos
+// Ruta para buscar Alumnos
 router.get('/buscar', (req, res) => {
     const query = req.query.query;
 
