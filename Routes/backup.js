@@ -3,6 +3,7 @@ const router = express.Router();
 const mysqldump = require('mysqldump');
 const pool = require('../db');
 const fs = require('fs');
+const { DB_HOST, DB_USER, DB_NAME, DB_PASSWORD, DB_PORT } = require('../config');
 
 // Ruta para realizar copias de seguridad de la DB
 router.get('/backup', async (req, res) => {
@@ -17,10 +18,11 @@ router.get('/backup', async (req, res) => {
         // Realiza la copia de seguridad con mysqldump
         await mysqldump({
             connection: {
-                host: 'localhost', // Asegúrate de que los detalles sean correctos o que uses las variables de entorno.
-                user: 'root',
-                password: 'jhon1',
-                database: 'centro_escolar',
+                host: DB_HOST, 
+                user: DB_USER,
+                password: DB_PASSWORD,
+                database: DB_NAME,
+                port: DB_PORT
             },
             dumpToFile: backupFile,
         });
@@ -31,6 +33,7 @@ router.get('/backup', async (req, res) => {
         res.status(500).send('Error al generar la copia de seguridad');
     }
 });
+
 
 
 module.exports = router;
