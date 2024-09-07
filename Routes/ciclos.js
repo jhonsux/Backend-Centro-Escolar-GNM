@@ -10,7 +10,7 @@ require('dotenv').config();
 
 // Ruta para obtener todos los Ciclos
 router.get('/', verifyToken, (req, res) => {
-    const query = `SELECT * FROM ciclos_escolares`;
+    const query = `SELECT * FROM Ciclos_Escolares`;
 
     pool.query(query, (error, results) => {
         if (error) {
@@ -40,7 +40,7 @@ router.post('/crear', verifyToken, (req, res) => {
             }
 
             // Paso 1: Insertar el nuevo ciclo escolar
-            const queryCiclo = `INSERT INTO ciclos_escolares (fecha_inicio, fecha_fin) VALUES (?, ?)`;
+            const queryCiclo = `INSERT INTO Ciclos_Escolares (fecha_inicio, fecha_fin) VALUES (?, ?)`;
             connection.query(queryCiclo, [fecha_inicio, fecha_fin], (error, results) => {
                 if (error) {
                     console.error('Error al insertar ciclo escolar:', error);
@@ -51,9 +51,9 @@ router.post('/crear', verifyToken, (req, res) => {
                 }
 
                 // Paso 2: Mover alumnos del sexto semestre a la tabla de graduados
-                const queryMoverAlumnos = `INSERT INTO alumnos_graduados (student_id, name, firstname, lastname, sex, status, group_id, semester_id, parent_id)
+                const queryMoverAlumnos = `INSERT INTO Alumnos_Graduados (student_id, name, firstname, lastname, sex, status, group_id, semester_id, parent_id)
                     SELECT student_id, name, firstname, lastname, sex, status, group_id, semester_id, parent_id
-                    FROM alumnos
+                    FROM Alumnos
                     WHERE semester_id = 7`;
                 connection.query(queryMoverAlumnos, (error, results) => {
                     if (error) {
@@ -65,7 +65,7 @@ router.post('/crear', verifyToken, (req, res) => {
                     }
 
                     // Paso 3: Eliminar alumnos del sexto semestre de la tabla original
-                    const queryEliminarAlumnos = `DELETE FROM alumnos WHERE semester_id = 7`;
+                    const queryEliminarAlumnos = `DELETE FROM Alumnos WHERE semester_id = 7`;
                     connection.query(queryEliminarAlumnos, (error, results) => {
                         if (error) {
                             console.error('Error al eliminar alumnos:', error);

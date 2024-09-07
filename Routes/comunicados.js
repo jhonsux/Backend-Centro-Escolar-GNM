@@ -7,7 +7,7 @@ require('dotenv').config();
 
  // ruta para ver los datos del comunicado
  router.get('/', (req, res) => {
-    const query = `SELECT * FROM comunicados`;
+    const query = `SELECT * FROM Comunicados`;
 
     pool.query(query, (error, results) => {
         if (error) {
@@ -22,7 +22,7 @@ require('dotenv').config();
 // Ruta para obtener un registro de alumnos por ID
 router.get('/:id', (req, res) => {
     const { id } = req.params;
-    const query = `SELECT * FROM comunicados WHERE parent_id = ?`;
+    const query = `SELECT * FROM Comunicados WHERE parent_id = ?`;
 
     pool.query(query, [id], (error, results) => {
         if (error) {
@@ -57,7 +57,7 @@ router.get('/:id', (req, res) => {
         });
     }
 
-    const query = `INSERT INTO comunicados (communication_id, parent_id, date, method, description) VALUES (?, ?, ?, ?, ?)`;
+    const query = `INSERT INTO Comunicados (communication_id, parent_id, date, method, description) VALUES (?, ?, ?, ?, ?)`;
 
     const values = [
         comunicado.communication_id,

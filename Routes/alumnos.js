@@ -192,10 +192,10 @@ router.get('/reporte/:id', (req, res) => {
 router.get('/:id/reportes', (req, res) => {
     const { id } = req.params;
 
-    const query = `SELECT report_id, student_id, i.type_name AS incidencia, u.name AS user, reportes.description, justificado, date
+    const query = `SELECT report_id, student_id, i.type_name AS incidencia, u.name AS user, Reportes.description, justificado, date
                    FROM Reportes
-                   JOIN tipos_incidencias AS i ON reportes.type_id = i.type_id
-                   JOIN usuarios AS u ON reportes.user_id = u.user_id     
+                   JOIN tipos_incidencias AS i ON Reportes.type_id = i.type_id
+                   JOIN Usuarios AS u ON Reportes.user_id = u.user_id     
                    WHERE student_id = ?`;
 
     pool.query(query, [id], (error, results) => {

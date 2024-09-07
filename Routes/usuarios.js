@@ -21,10 +21,6 @@ router.get('/usuarios', (req, res) => {
     });
 });
 
-router.get('/ping', (req, res) => {
-    res.send(' ping has result')
-})
-
 // Ruta para consultar Usuario con ID
 router.get('/usuarios/:id', (req, res) => {
     const { id } = req.params;
@@ -48,18 +44,9 @@ router.get('/usuarios/:id', (req, res) => {
     });
 });
 
-
-
-// router.put('/usuarios/actualizar/:id',verifyToken, (req, res) => {
+// Ruta para actualizar un usuario por ID
 router.put('/usuarios/actualizar/:id', async (req, res) => {
-    const { 
-        name, 
-        firstname, 
-        lastname,
-        email, 
-        password, 
-        user_types 
-    } = req.body;
+    const { name, firstname, lastname, email, password, user_types } = req.body;
     const { id } = req.params;
 
     if (!id) {
@@ -80,13 +67,13 @@ router.put('/usuarios/actualizar/:id', async (req, res) => {
         query += ` WHERE user_id = ?`;
         updateFields.push(id);
 
-        connection.query(query, updateFields, (err, results) => {
+        pool.query(query, updateFields, (err, results) => {
             if (err) {
                 console.error(`Error en la consulta SQL: ${err.message}`);
                 return res.status(500).json({ error: err.message });
             }
             res.status(200).json({ message: 'Usuario actualizado exitosamente' });
-            console.log(password)
+            console.log(password);
         });
     } catch (err) {
         console.error(`Error al actualizar el usuario: ${err.message}`);
@@ -94,24 +81,23 @@ router.put('/usuarios/actualizar/:id', async (req, res) => {
     }
 });
 
+// Ruta para eliminar un usuario por ID
+router.delete('/usuarios/:id', verifyToken, (req, res) => {
+    const { id } = req.params;
 
-// Ruta pra eliminar usuario por ID
-router.delete('/usuarios/:id',verifyToken, (req, res) => {
+    const query = `DELETE FROM Usuarios WHERE user_id = ?`;
 
-    const { id } = req.params
-
-    const query = `DELETE FROM Usuarios WHERE user_id='${id}'`
-
-    connection.query(query, (error, results) => {
+    pool.query(query, [id], (error, results) => {
         if (error) {
             console.error('Error en la consulta SQL:', error);
             return res.status(500).send('Error en la consulta SQL');
         }            
-        res.status(201).json({
-            message: 'Usuario se borro correctamente',
+        res.status(200).json({
+            message: 'Usuario se borró correctamente',
             data: results
-        })
+        });
     });
-})
+});
+
 
 module.exports = router;
