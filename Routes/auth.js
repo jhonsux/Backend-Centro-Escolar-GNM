@@ -9,38 +9,40 @@ require('dotenv').config();
 
 // Ruta para iniciar sesión
 router.post('/login', (req, res) => {
-    //const { username, password } = req.body;
     const { email, password } = req.body;
 
     // Comprobar que el cuerpo de la solicitud tiene los campos necesarios
     if (!email || !password) {
-        return res.status(400).json({ message: 'Por favor, proporcione un correo valido y una contraseña' });
+        return res.status(400).json({ message: 'Por favor, proporcione un correo válido y una contraseña' });
     }
 
-     console.log(`Buscando email con: ${email}`, `Buscando email con contraseña: ${password}`);
+    console.log(`Buscando email con: ${email}`, `Buscando email con contraseña: ${password}`);
 
     const query = `SELECT * FROM usuarios WHERE email = ?`;
-    connection.query(query, [email], async (err, results) => {
+    
+    // Usando pool en lugar de connection
+    pool.query(query, [email], async (err, results) => {
         if (err) {
             console.error(`Error en la consulta SQL: ${err.message}`);
             return res.status(500).json({ error: err.message });
         }
 
-         console.log(`Resultados de la consulta para email ${email}:`);
+        console.log(`Resultados de la consulta para email ${email}:`);
 
         if (results.length === 0) {
             console.log(`email no encontrado: ${email}`);
             return res.status(401).json({ message: 'email no encontrado' });
         }
 
-          const user = results[0];
-          console.log(`Usuario encontrado:`, user);
+        const user = results[0];
+        console.log(`Usuario encontrado:`, user);
 
         try {
             const match = await bcrypt.compare(password, user.password);
             if (!match) {
                 return res.status(401).json({ message: 'Contraseña incorrecta' });
             }
+            
             // Crear el token JWT
             const token = jwt.sign(
                 { id: user.user_id, email: user.email, tipo: user.user_types }, 
@@ -126,8 +128,8 @@ router.post('/register', async (req, res) => {
         // Query para insertar un nuevo usuario
         const query = `INSERT INTO Usuarios (user_id, name, firstname, lastname, email, password, user_types)
                        VALUES (?, ?, ?, ?, ?, ?, ?)`;
- const fullQuery = pool.format(query, [user_id, name, firstname, lastname, email, hashedPassword, user_types]);
-        console.log('Consulta SQL completa:', fullQuery);
+        const fullQuery = pool.format(query, [user_id, name, firstname, lastname, email, hashedPassword, user_types]);
+                console.log('Consulta SQL completa:', fullQuery);
         // Ejecutar la consulta usando el pool
         pool.query(query, [user_id, name, firstname, lastname, email, hashedPassword, user_types], (err, results) => {
             if (err) {
