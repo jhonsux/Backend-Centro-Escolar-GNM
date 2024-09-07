@@ -60,39 +60,6 @@ router.post('/login', (req, res) => {
 });
 
 // // Ruta para registrar un nuevo usuario
-// router.post('/register', async (req, res) => {
-//     const { 
-//         user_id, 
-//         name, 
-//         firstname, 
-//         lastname ,
-//         email, 
-//         password, 
-//         user_types } = req.body;
-
-//     if (!email || !password) {
-//         return res.status(400).json({ message: 'Por favor, proporcione un correo valido y una contraseña' });
-//     }
-
-//     try {
-//         const hashedPassword = await bcrypt.hash(password, 10);
-//         const query = `INSERT INTO Usuarios (user_id, name, firstname, lastname, email, password, user_types)
-//         VALUES (?, ?, ?, ?, ?, ?, ?)`;
-
-//         connection.query(query, [user_id, name, firstname, lastname, email, hashedPassword, user_types], (err, results) => {
-//             if (err) {
-//                 console.error(`Error en la consulta SQL: ${err.message}`);
-//                 return res.status(500).json({ error: err.message });
-//             }
-//             res.status(201).json({ message: 'Usuario registrado exitosamente' });
-//         });
-//     } catch (err) {
-//         console.error(`Error al hashear la contraseña: ${err.message}`);
-//         res.status(500).json({ error: err.message });
-//     }
-// });
-
-
 router.post('/register', async (req, res) => {
     const { 
         user_id, 

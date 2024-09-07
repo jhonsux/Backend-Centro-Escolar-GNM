@@ -6,10 +6,11 @@ const pool = require('../db');
 require('dotenv').config();
 
 
-// Ruta para obtener todos los registros de alumnos
+// Ruta para obtener todos los registros de Alumnos
 router.get('/', verifyToken, (req, res) => {
-    const query = `SELECT alumnos.student_id, alumnos.name, alumnos.firstname, alumnos.lastname, alumnos.sex, alumnos.status, alumnos.group_id, semestres.semester AS semestre, alumnos.parent_id
-                   FROM alumnos 
+    const query = `SELECT alumnos.student_id, alumnos.name, alumnos.firstname, alumnos.lastname, alumnos.sex, alumnos.status, alumnos.group_id, 
+    semestres.semester AS semestre, alumnos.parent_id
+                   FROM Alumnos 
                    JOIN semestres ON alumnos.semester_id = semestres.semester_id
                    ORDER BY alumnos.group_id`;
 
@@ -36,7 +37,7 @@ router.get('/buscar', (req, res) => {
         return res.status(400).json({ message: 'Debe proporcionar un término de búsqueda' });
     }
 
-    const sql = `SELECT * FROM alumnos 
+    const sql = `SELECT * FROM Alumnos 
                  WHERE CONCAT(name, ' ', firstname, ' ', lastname) LIKE ? 
                  OR name LIKE ? 
                  OR firstname LIKE ? 
@@ -67,7 +68,7 @@ router.get('/:id', (req, res) => {
 
     console.log('Buscando alumno con ID:', id);
 
-    const query = `SELECT * FROM alumnos WHERE student_id = ?`;
+    const query = `SELECT * FROM Alumnos WHERE student_id = ?`;
 
     pool.query(query, [id], (error, results) => {
         if (error) {
@@ -135,7 +136,7 @@ router.put('/actualizar/:id', verifyToken, (req, res) => {
     const { id } = req.params;
     const { name, firstname, lastname, sex, status, group_id, semester_id, parent_id } = req.body;
 
-    const query = `UPDATE alumnos 
+    const query = `UPDATE Alumnos 
                    SET name = ?, firstname = ?, lastname = ?, sex = ?, status = ?, group_id = ?, semester_id = ?, parent_id = ? 
                    WHERE student_id = ?`;
 
@@ -174,7 +175,7 @@ router.delete('/:id', verifyToken, (req, res) => {
 // Ruta para obtener el reporte del alumno
 router.get('/reporte/:id', (req, res) => {
     const { id } = req.params;
-    const query = `SELECT * FROM alumnos WHERE student_id = ?`;
+    const query = `SELECT * FROM Alumnos WHERE student_id = ?`;
 
     pool.query(query, [id], (error, results) => {
         if (error) {
@@ -192,7 +193,7 @@ router.get('/:id/reportes', (req, res) => {
     const { id } = req.params;
 
     const query = `SELECT report_id, student_id, i.type_name AS incidencia, u.name AS user, reportes.description, justificado, date
-                   FROM reportes
+                   FROM Reportes
                    JOIN tipos_incidencias AS i ON reportes.type_id = i.type_id
                    JOIN usuarios AS u ON reportes.user_id = u.user_id     
                    WHERE student_id = ?`;
