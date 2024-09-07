@@ -18,7 +18,7 @@ router.post('/login', (req, res) => {
 
     console.log(`Buscando email con: ${email}`, `Buscando email con contraseña: ${password}`);
 
-    const query = `SELECT * FROM usuarios WHERE email = ?`;
+    const query = `SELECT * FROM Usuarios WHERE email = ?`;
     
     // Usando pool en lugar de connection
     pool.query(query, [email], async (err, results) => {

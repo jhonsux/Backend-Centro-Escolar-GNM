@@ -6,7 +6,7 @@ const morgan = require('morgan');
 app.use(morgan('dev'));
 
 
-//const routes = require('./routes');
+//const routes = require('./routes'); rutas a carpetas dentro de la api
 const alumnosRoutes = require('./Routes/alumnos');
 const tutoresRoutes = require('./Routes/tutores');
 const reportesRoutes = require('./Routes/reportes');
@@ -20,10 +20,10 @@ const authRoutes = require('./Routes/auth');
 
 require('dotenv').config();
 
-app.use(express.json());
-app.use(express.text());
+app.use(express.json()); //aprende format json
+app.use(express.text()); //aprende format texto
 
-
+//rutas de api para consultas sql
 app.use('/alumnos',alumnosRoutes);
 app.use(tutoresRoutes);
 app.use(reportesRoutes);
