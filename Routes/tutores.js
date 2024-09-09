@@ -52,6 +52,12 @@ router.post('/tutores/crear', (req, res) => {
         description: req.body.description
     };
 
+    if (!tutor.parent_id || tutor.parent_id.trim() === '' || !tutor.name || tutor.name.trim() === '') {
+        return res.status(400).json({
+            message: 'Todos los campos son obligatorios y no pueden estar vacíos'
+        });
+    }
+
     const query = `INSERT INTO Tutores (parent_id, name, firstname, lastname, adress, telephone, email, celphone, description)
                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
@@ -85,6 +91,12 @@ router.put('/tutores/actualizar/:id', (req, res) => {
     const { id } = req.params;
 
     const { name, firstname, lastname, adress, telephone, email, celphone, description } = req.body;
+    
+    if (!name || name.trim() === '' || !firstname || firstname.trim() === '') {
+        return res.status(400).json({
+            message: 'Todos los campos son obligatorios y no pueden estar vacíos'
+        });
+    }
 
     const query = `UPDATE Tutores SET name = ?, firstname = ?, lastname = ?, adress = ?, telephone = ?, email = ?, celphone = ?, description = ?
                    WHERE parent_id = ?`;

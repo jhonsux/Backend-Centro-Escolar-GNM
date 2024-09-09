@@ -71,6 +71,12 @@ router.post('/register', async (req, res) => {
         user_types 
     } = req.body;
 
+    
+    if (!user_id || user_id.trim() === '' || !name || name.trim() === '') {
+        return res.status(400).json({
+            message: 'Todos los campos son obligatorios y no pueden estar vacíos'
+        });
+    }
 
     if (!email || !password) {
         return res.status(400).json({ message: 'Por favor, proporcione un correo válido y una contraseña' });
@@ -80,23 +86,11 @@ router.post('/register', async (req, res) => {
         // Hashear la contraseña
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Log de los datos que se van a insertar
-        console.log('Datos que se van a insertar:', {
-            user_id,
-            name,
-            firstname,
-            lastname,
-            email,
-            hashedPassword,
-            user_types
-        });
-
        
         // Query para insertar un nuevo usuario
         const query = `INSERT INTO Usuarios (user_id, name, firstname, lastname, email, password, user_types)
                        VALUES (?, ?, ?, ?, ?, ?, ?)`;
-        const fullQuery = pool.format(query, [user_id, name, firstname, lastname, email, hashedPassword, user_types]);
-                console.log('Consulta SQL completa:', fullQuery);
+
         // Ejecutar la consulta usando el pool
         pool.query(query, [user_id, name, firstname, lastname, email, hashedPassword, user_types], (err, results) => {
             if (err) {

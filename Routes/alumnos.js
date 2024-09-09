@@ -136,6 +136,12 @@ router.put('/actualizar/:id', verifyToken, (req, res) => {
     const { id } = req.params;
     const { name, firstname, lastname, sex, status, group_id, semester_id, parent_id } = req.body;
 
+    if (!name || name.trim() === '' || !parent_id || parent_id.trim() === '') {
+        return res.status(400).json({
+            message: 'Todos los campos son obligatorios y no pueden estar vacíos'
+        });
+    }
+
     const query = `UPDATE Alumnos 
                    SET name = ?, firstname = ?, lastname = ?, sex = ?, status = ?, group_id = ?, semester_id = ?, parent_id = ? 
                    WHERE student_id = ?`;

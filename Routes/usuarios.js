@@ -49,8 +49,11 @@ router.put('/usuarios/actualizar/:id', async (req, res) => {
     const { name, firstname, lastname, email, password, user_types } = req.body;
     const { id } = req.params;
 
-    if (!id) {
-        return res.status(400).json({ message: 'ID de usuario no proporcionado' });
+  
+    if (!tutor.parent_id || tutor.parent_id.trim() === '' || !tutor.name || tutor.name.trim() === '') {
+        return res.status(400).json({
+            message: 'Todos los campos son obligatorios y no pueden estar vacíos'
+        });
     }
 
     try {
