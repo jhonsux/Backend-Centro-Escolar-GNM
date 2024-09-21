@@ -32,7 +32,7 @@ app.use('/auth',authRoutes);
 app.use('/incidencias',incidenciasRoutes);
 app.use('/justificantes',justificantesRoutes);
 app.use('/ciclos',ciclosRoutes);
-app.use(dataBase);
+app.use('/backup', dataBase);
 app.use('/comunicados',comunicadosRoutes);
 
 const PORT = process.env.PORT || 3000;

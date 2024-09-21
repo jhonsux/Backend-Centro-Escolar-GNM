@@ -21,74 +21,130 @@ router.get('/', verifyToken, (req, res) => {
     });
 });
 
-
 // Ruta para Crear un nuevo Ciclo
-router.post('/crear', verifyToken, (req, res) => {
+router.post('/crear-ciclo', verifyToken, (req, res) => {
     const { fecha_inicio, fecha_fin } = req.body;
 
-    pool.getConnection((err, connection) => {
-        if (err) {
-            console.error('Error al obtener la conexión del pool:', err);
+    pool.getConnection((error, connection) => {
+        if (error) {
+            console.error('Error al obtener la conexión del pool:', error);
             return res.status(500).send('Error al obtener la conexión');
         }
 
         connection.beginTransaction(error => {
             if (error) {
                 console.error('Error al iniciar la transacción:', error);
-                connection.release(); // Liberar la conexión
+                connection.release();
                 return res.status(500).send('Error al iniciar la transacción');
             }
 
-            // Paso 1: Insertar el nuevo ciclo escolar
             const queryCiclo = `INSERT INTO Ciclos_Escolares (fecha_inicio, fecha_fin) VALUES (?, ?)`;
             connection.query(queryCiclo, [fecha_inicio, fecha_fin], (error, results) => {
                 if (error) {
-                    console.error('Error al insertar ciclo escolar:', error);
+                    console.error('Error al crear ciclo escolar:', error);
                     return connection.rollback(() => {
                         connection.release();
-                        res.status(500).send('Error al insertar ciclo escolar');
+                        res.status(500).send('Error al crear ciclo escolar');
                     });
                 }
 
-                // Paso 2: Mover alumnos del sexto semestre a la tabla de graduados
-                const queryMoverAlumnos = `INSERT INTO Alumnos_Graduados (student_id, name, firstname, lastname, sex, status, group_id, semester_id, parent_id)
-                    SELECT student_id, name, firstname, lastname, sex, status, group_id, semester_id, parent_id
-                    FROM Alumnos
-                    WHERE semester_id = 7`;
-                connection.query(queryMoverAlumnos, (error, results) => {
+                connection.commit(error => {
                     if (error) {
-                        console.error('Error al mover alumnos:', error);
+                        console.error('Error al hacer commit:', error);
                         return connection.rollback(() => {
                             connection.release();
-                            res.status(500).send('Error al mover alumnos');
+                            res.status(500).send('Error al finalizar la transacción');
                         });
                     }
 
-                    // Paso 3: Eliminar alumnos del sexto semestre de la tabla original
-                    const queryEliminarAlumnos = `DELETE FROM Alumnos WHERE semester_id = 7`;
-                    connection.query(queryEliminarAlumnos, (error, results) => {
-                        if (error) {
-                            console.error('Error al eliminar alumnos:', error);
-                            return connection.rollback(() => {
-                                connection.release();
-                                res.status(500).send('Error al eliminar alumnos');
-                            });
-                        }
+                    connection.release();
+                    res.status(201).json({
+                        message: 'Ciclo escolar creado correctamente',
+                        ciclo_escolar_id: results.insertId
                     });
+                });
+            });
+        });
+    });
+});
 
-                    // Commit de la transacción
+// buscar ciclo escolar por id
+router.get('/:id', verifyToken, (req, res) => {
+    const id = req.params.id;
+    const queryBuscarCiclo = `SELECT * FROM Ciclos_Escolares WHERE cicle_id = ?`;
+
+    pool.query(queryBuscarCiclo, [id], (error, results) => {
+        if (error) {
+            console.error('Error al buscar ciclo escolar:', error);
+            return res.status(500).send('Error al buscar ciclo escolar');
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({
+                message: 'Ciclo escolar no encontrado'
+            });
+        }
+
+        res.status(200).json({
+            message: 'Ciclo escolar encontrado',
+            ciclo_escolar: results[0]
+        });
+    });
+});
+
+// crear periodo escolar
+router.post('/crear-periodo', verifyToken, (req, res) => {
+    const { nombre, fecha_inicio, fecha_fin, cicle_id } = req.body;
+
+    pool.getConnection((error, connection) => {
+        if (error) {
+            console.error('Error al obtener la conexión del pool:', error);
+            return res.status(500).send('Error al obtener la conexión');
+        }
+
+        connection.beginTransaction(error => {
+            if (error) {
+                console.error('Error al iniciar la transacción:', error);
+                connection.release();
+                return res.status(500).send('Error al iniciar la transacción');
+            }
+
+            const queryPeriodo = `INSERT INTO periodos_escolares (nombre, fecha_inicio, fecha_fin, cicle_id) VALUES (?, ?, ?, ?)`;
+            connection.query(queryPeriodo, [nombre, fecha_inicio, fecha_fin, cicle_id], (error, results) => {
+                if (error) {
+                    console.error('Error al crear periodo escolar:', error);
+                    return connection.rollback(() => {
+                        connection.release();
+                        res.status(500).send('Error al crear periodo escolar');
+                    });
+                }
+
+                const periodoId = results.insertId;
+
+                const queryActualizarSemestres = `UPDATE Semestres
+                    SET semester_id = semester_id + 1
+                    WHERE cicle_id = ?`;
+                connection.query(queryActualizarSemestres, [cicle_id], (error, results) => {
+                    if (error) {
+                        console.error('Error al actualizar semestres:', error);
+                        return connection.rollback(() => {
+                            connection.release();
+                            res.status(500).send('Error al actualizar semestres');
+                        });
+                    }
+
                     connection.commit(error => {
                         if (error) {
                             console.error('Error al hacer commit:', error);
                             return connection.rollback(() => {
                                 connection.release();
-                                res.status(500).send('Error al hacer commit');
+                                res.status(500).send('Error al finalizar la transacción');
                             });
                         }
 
-                        connection.release(); // Liberar la conexión
+                        connection.release();
                         res.status(201).json({
-                            message: 'Ciclo escolar creado, semestres actualizados, y alumnos graduados movidos correctamente'
+                            message: 'Periodo escolar creado y semestres actualizados correctamente'
                         });
                     });
                 });
@@ -97,46 +153,6 @@ router.post('/crear', verifyToken, (req, res) => {
     });
 });
 
-
-// Ruta para subir datos a la tabla Alumnos
-const upload = multer({ dest: 'uploads/' });
-
-router.post('/upload', upload.single('file'), (req, res) => {
-    const filePath = req.file.path;
-
-    fs.createReadStream(filePath)
-        .pipe(csv())
-        .on('data', (row) => {
-            // Eliminar el BOM si está presente en la clave 'student_id'
-            if (row['﻿student_id']) {
-                row.student_id = row['﻿student_id'];
-                delete row['﻿student_id'];
-            }
-
-            console.log('Student ID:', row.student_id);
-
-            const query = 'INSERT INTO Alumnos (student_id, name, firstname, lastname, sex, status, group_id, semester_id, parent_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
-            pool.query(query, [
-                row.student_id,
-                row.name,
-                row.firstname,
-                row.lastname,
-                row.sex,
-                row.status,
-                row.group_id,
-                row.semester_id,
-                row.parent_id
-            ], (error) => {
-                if (error) {
-                    console.error('Error al insertar datos:', error);
-                }
-            });
-        })
-        .on('end', () => {
-            console.log('CSV procesado exitosamente');
-            res.status(201).json({ message: 'Datos agregados correctamente desde CSV' });
-        });
-});
 
 
 
