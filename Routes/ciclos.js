@@ -118,35 +118,10 @@ router.post('/crear-periodo', verifyToken, (req, res) => {
                         res.status(500).send('Error al crear periodo escolar');
                     });
                 }
-
-                const periodoId = results.insertId;
-
-                // Llamada al procedimiento almacenado para mover graduados y actualizar semestres
-                const queryMoverGraduados = `CALL MoverGraduadosYActualizarSemestres(?)`;
-                connection.query(queryMoverGraduados, [periodoId], (error, results) => {
-                    if (error) {
-                        console.error('Error al mover graduados y actualizar semestres:', error);
-                        return connection.rollback(() => {
-                            connection.release();
-                            res.status(500).send('Error al mover graduados y actualizar semestres');
-                        });
-                    }
-
-                    connection.commit(error => {
-                        if (error) {
-                            console.error('Error al hacer commit:', error);
-                            return connection.rollback(() => {
-                                connection.release();
-                                res.status(500).send('Error al finalizar la transacción');
-                            });
-                        }
-
-                        connection.release();
-                        res.status(201).json({
-                            message: 'Periodo escolar creado, alumnos graduados y semestres actualizados correctamente'
-                        });
+                connection.release();
+                    res.status(201).json({
+                        message: 'Periodo escolar creado y semestres actualizados correctamente'
                     });
-                });
             });
         });
     });
