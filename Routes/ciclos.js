@@ -121,15 +121,14 @@ router.post('/crear-periodo', verifyToken, (req, res) => {
 
                 const periodoId = results.insertId;
 
-                const queryActualizarSemestres = `UPDATE Semestres
-                    SET semester_id = semester_id + 1
-                    WHERE cicle_id = ?`;
-                connection.query(queryActualizarSemestres, [periodoId], (error, results) => {
+                // Llamada al procedimiento almacenado para mover graduados y actualizar semestres
+                const queryMoverGraduados = `CALL MoverGraduadosYActualizarSemestres(?)`;
+                connection.query(queryMoverGraduados, [periodoId], (error, results) => {
                     if (error) {
-                        console.error('Error al actualizar semestres:', error);
+                        console.error('Error al mover graduados y actualizar semestres:', error);
                         return connection.rollback(() => {
                             connection.release();
-                            res.status(500).send('Error al actualizar semestres');
+                            res.status(500).send('Error al mover graduados y actualizar semestres');
                         });
                     }
 
@@ -144,7 +143,7 @@ router.post('/crear-periodo', verifyToken, (req, res) => {
 
                         connection.release();
                         res.status(201).json({
-                            message: 'Periodo escolar creado y semestres actualizados correctamente'
+                            message: 'Periodo escolar creado, alumnos graduados y semestres actualizados correctamente'
                         });
                     });
                 });
@@ -152,6 +151,7 @@ router.post('/crear-periodo', verifyToken, (req, res) => {
         });
     });
 });
+
 
 
 
