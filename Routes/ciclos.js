@@ -124,7 +124,7 @@ router.post('/crear-periodo', verifyToken, (req, res) => {
                 const queryActualizarSemestres = `UPDATE Semestres
                     SET semester_id = semester_id + 1
                     WHERE cicle_id = ?`;
-                connection.query(queryActualizarSemestres, [cicle_id], (error, results) => {
+                connection.query(queryActualizarSemestres, [periodoId], (error, results) => {
                     if (error) {
                         console.error('Error al actualizar semestres:', error);
                         return connection.rollback(() => {
