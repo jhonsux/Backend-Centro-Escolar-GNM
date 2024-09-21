@@ -109,7 +109,7 @@ router.post('/crear-periodo', verifyToken, (req, res) => {
                 return res.status(500).send('Error al iniciar la transacción');
             }
 
-            const queryPeriodo = `INSERT INTO periodos_escolares (nombre, fecha_inicio, fecha_fin, cicle_id) VALUES (?, ?, ?, ?)`;
+            const queryPeriodo = `INSERT INTO Periodos_Escolares (nombre, fecha_inicio, fecha_fin, cicle_id) VALUES (?, ?, ?, ?)`;
             connection.query(queryPeriodo, [nombre, fecha_inicio, fecha_fin, cicle_id], (error, results) => {
                 if (error) {
                     console.error('Error al crear periodo escolar:', error);
