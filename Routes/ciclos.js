@@ -118,10 +118,21 @@ router.post('/crear-periodo', verifyToken, (req, res) => {
                         res.status(500).send('Error al crear periodo escolar');
                     });
                 }
-                connection.release();
+
+                // Commit después de la inserción exitosa
+                connection.commit(error => {
+                    if (error) {
+                        console.error('Error al hacer commit:', error);
+                        return connection.rollback(() => {
+                            connection.release();
+                            return res.status(500).send('Error al hacer commit');
+                        });
+                    }
+                    connection.release();
                     res.status(201).json({
                         message: 'Periodo escolar creado y semestres actualizados correctamente'
                     });
+                });
             });
         });
     });
