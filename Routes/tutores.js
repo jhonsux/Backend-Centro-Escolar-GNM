@@ -6,7 +6,9 @@ const pool = require('../db');
 
 // Ruta para obtener registro de tutores
 router.get('/tutores', (req, res) => {
-    const query = `SELECT * FROM Tutores`;
+    const query = `SELECT * 
+    FROM Tutores
+    ORDER BY firstname`;
 
     pool.query(query, (error, results) => {
         if (error) {
