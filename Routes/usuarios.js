@@ -9,7 +9,9 @@ require('dotenv').config();
 // Ruta para consultar todos los usuarios
 router.get('/usuarios', (req, res) => {
 
-    const query = `SELECT * FROM Usuarios`;
+    const query = `SELECT * 
+    FROM Usuarios
+    ORDER BY firstname`;
 
     // Ejecutar la consulta usando el pool
     pool.query(query, (error, results) => {
