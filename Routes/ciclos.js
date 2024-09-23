@@ -92,7 +92,7 @@ router.get('/:id', verifyToken, (req, res) => {
     });
 });
 
-// crear periodo escolar
+// Crear periodo escolar y actualizar semestres
 router.post('/crear-periodo', verifyToken, (req, res) => {
     const { nombre, fecha_inicio, fecha_fin, cicle_id } = req.body;
 
@@ -109,34 +109,77 @@ router.post('/crear-periodo', verifyToken, (req, res) => {
                 return res.status(500).send('Error al iniciar la transacción');
             }
 
+            // Insertar el nuevo periodo escolar
             const queryPeriodo = `INSERT INTO Periodos_Escolares (nombre, fecha_inicio, fecha_fin, cicle_id) VALUES (?, ?, ?, ?)`;
             connection.query(queryPeriodo, [nombre, fecha_inicio, fecha_fin, cicle_id], (error, results) => {
                 if (error) {
-                    console.error('Error al crear periodo escolar:', error);
+                    console.error('Error al crear el periodo escolar:', error);
                     return connection.rollback(() => {
                         connection.release();
-                        res.status(500).send('Error al crear periodo escolar');
+                        res.status(500).send('Error al crear el periodo escolar');
                     });
                 }
 
-                // Commit después de la inserción exitosa
-                connection.commit(error => {
+                // Actualizar los semestres de los alumnos
+                const updateSemestreQuery = `UPDATE alumnos SET semester_id = semester_id + 1 WHERE semester_id < 7`;
+                connection.query(updateSemestreQuery, (error, results) => {
                     if (error) {
-                        console.error('Error al hacer commit:', error);
+                        console.error('Error al actualizar semestres:', error);
                         return connection.rollback(() => {
                             connection.release();
-                            return res.status(500).send('Error al hacer commit');
+                            res.status(500).send('Error al actualizar semestres');
                         });
                     }
-                    connection.release();
-                    res.status(201).json({
-                        message: 'Periodo escolar creado y semestres actualizados correctamente'
+
+                    // Mover alumnos del 7º semestre a la tabla alumnos_graduados
+                    const moveGraduatedQuery = `
+                        INSERT INTO alumnos_graduados (student_id, name, firstname, lastname, sex, status, group_id, semester_id, parent_id)
+                        SELECT student_id, name, firstname, lastname, sex, status, group_id, semester_id, parent_id
+                        FROM alumnos
+                        WHERE semester_id = 7
+                    `;
+                    connection.query(moveGraduatedQuery, (error, results) => {
+                        if (error) {
+                            console.error('Error al mover alumnos a alumnos_graduados:', error);
+                            return connection.rollback(() => {
+                                connection.release();
+                                res.status(500).send('Error al mover alumnos a alumnos graduados');
+                            });
+                        }
+
+                        // Eliminar los alumnos del 7º semestre de la tabla alumnos
+                        const deleteGraduatedQuery = `DELETE FROM alumnos WHERE semester_id = 7`;
+                        connection.query(deleteGraduatedQuery, (error, results) => {
+                            if (error) {
+                                console.error('Error al eliminar alumnos del 7º semestre:', error);
+                                return connection.rollback(() => {
+                                    connection.release();
+                                    res.status(500).send('Error al eliminar alumnos del 7º semestre');
+                                });
+                            }
+
+                            connection.commit(error => {
+                                if (error) {
+                                    console.error('Error al hacer commit de la transacción:', error);
+                                    return connection.rollback(() => {
+                                        connection.release();
+                                        res.status(500).send('Error al hacer commit de la transacción');
+                                    });
+                                }
+
+                                connection.release();
+                                res.status(201).json({
+                                    message: 'Periodo escolar creado, semestres actualizados y alumnos graduados movidos correctamente'
+                                });
+                            });
+                        });
                     });
                 });
             });
         });
     });
 });
+
 
 
 
