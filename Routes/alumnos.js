@@ -28,6 +28,30 @@ router.get('/', verifyToken, (req, res) => {
     });
 });
 
+// Ruta para obtener todos los alumnos graduados
+router.get('/graduados', verifyToken, (req, res) => {
+    // const query = `SELECT Alumnos.student_id, Alumnos.name, Alumnos.firstname, Alumnos.lastname, Alumnos.sex, Alumnos.status, Alumnos.group_id, 
+    // Semestres.semester AS semestre, Alumnos.parent_id
+    //                FROM Alumnos 
+    //                JOIN Semestres ON Alumnos.semester_id = Semestres.semester_id
+    //                ORDER BY Alumnos.group_id`;
+    const query = `SELECT *
+                   FROM Alumnos`;
+
+    // Usando pool en lugar de connection
+    pool.query(query, (error, results) => {
+        if (error) {
+            console.error('Error en la consulta SQL:', error);
+            return res.status(500).send('Error en la consulta SQL');
+        }
+        if (results.length > 0) { // Verifica si hay resultados
+            res.status(200).json(results);
+        } else {
+            res.status(404).json('No existen datos');
+        }
+    });
+});
+
 // Ruta para buscar Alumnos
 router.get('/buscar', (req, res) => {
     const query = req.query.query;
