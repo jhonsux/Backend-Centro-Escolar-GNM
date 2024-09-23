@@ -121,7 +121,7 @@ router.post('/crear-periodo', verifyToken, (req, res) => {
                 }
 
                 // Actualizar los semestres de los alumnos
-                const updateSemestreQuery = `UPDATE alumnos SET semester_id = semester_id + 1 WHERE semester_id < 7`;
+                const updateSemestreQuery = `UPDATE Alumnos SET semester_id = semester_id + 1 WHERE semester_id < 7`;
                 connection.query(updateSemestreQuery, (error, results) => {
                     if (error) {
                         console.error('Error al actualizar semestres:', error);
@@ -132,10 +132,9 @@ router.post('/crear-periodo', verifyToken, (req, res) => {
                     }
 
                     // Mover alumnos del 7º semestre a la tabla alumnos_graduados
-                    const moveGraduatedQuery = `
-                        INSERT INTO alumnos_graduados (student_id, name, firstname, lastname, sex, status, group_id, semester_id, parent_id)
+                    const moveGraduatedQuery = `INSERT INTO alumnos_graduados (student_id, name, firstname, lastname, sex, status, group_id, semester_id, parent_id)
                         SELECT student_id, name, firstname, lastname, sex, status, group_id, semester_id, parent_id
-                        FROM alumnos
+                        FROM Alumnos
                         WHERE semester_id = 7
                     `;
                     connection.query(moveGraduatedQuery, (error, results) => {
@@ -148,7 +147,7 @@ router.post('/crear-periodo', verifyToken, (req, res) => {
                         }
 
                         // Eliminar los alumnos del 7º semestre de la tabla alumnos
-                        const deleteGraduatedQuery = `DELETE FROM alumnos WHERE semester_id = 7`;
+                        const deleteGraduatedQuery = `DELETE FROM Alumnos WHERE semester_id = 7`;
                         connection.query(deleteGraduatedQuery, (error, results) => {
                             if (error) {
                                 console.error('Error al eliminar alumnos del 7º semestre:', error);
@@ -179,10 +178,5 @@ router.post('/crear-periodo', verifyToken, (req, res) => {
         });
     });
 });
-
-
-
-
-
 
 module.exports = router;
