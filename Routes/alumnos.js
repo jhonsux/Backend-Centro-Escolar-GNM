@@ -12,7 +12,7 @@ router.get('/', verifyToken, (req, res) => {
     Semestres.semester AS semestre, Alumnos.parent_id
                    FROM Alumnos 
                    JOIN Semestres ON Alumnos.semester_id = Semestres.semester_id
-                   ORDER BY Alumnos.group_id`;
+                   ORDER BY Alumnos.group_id, firstname`;
 
     // Usando pool en lugar de connection
     pool.query(query, (error, results) => {
@@ -36,7 +36,8 @@ router.get('/graduados', verifyToken, (req, res) => {
     //                JOIN Semestres ON Alumnos.semester_id = Semestres.semester_id
     //                ORDER BY Alumnos.group_id`;
     const query = `SELECT *
-                   FROM alumnos_graduados`;
+                   FROM alumnos_graduados
+                   ORDER BY Alumnos.group_id, firstname`;
 
     // Usando pool en lugar de connection
     pool.query(query, (error, results) => {
