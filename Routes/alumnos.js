@@ -36,7 +36,7 @@ router.get('/graduados', verifyToken, (req, res) => {
     //                JOIN Semestres ON Alumnos.semester_id = Semestres.semester_id
     //                ORDER BY Alumnos.group_id`;
     const query = `SELECT *
-                   FROM Alumnos`;
+                   FROM alumnos_graduados`;
 
     // Usando pool en lugar de connection
     pool.query(query, (error, results) => {
