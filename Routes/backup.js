@@ -10,9 +10,6 @@ const path = require('path');
 const Importer = require('mysql-import');
 const { DB_HOST, DB_USER, DB_NAME, DB_PASSWORD, DB_PORT } = require('../config');
 require('dotenv').config();
-// Configurar multer para manejar el archivo de respaldo
-const upload = multer({ dest: 'uploads/' });
-
 
 // Ruta para realizar copias de seguridad de la DB
 router.get('/', async (req, res) => {
@@ -35,8 +32,8 @@ router.get('/', async (req, res) => {
             },
             dumpToFile: backupFile,
             dump: {
-                // Añadir la opción para eliminar las tablas antes de recrearlas
-                addDropTable: true,  // Incluye DROP TABLE en el respaldo
+                addDropTable: true,  // Incluye DROP TABLE antes de cada CREATE TABLE
+                completeInsert: true  // Incluye nombres de columnas en los INSERT
             }
         });
 
@@ -46,6 +43,7 @@ router.get('/', async (req, res) => {
         res.status(500).send('Error al generar la copia de seguridad');
     }
 });
+
 
 // // Ruta para restaurar la base de datos
 // router.post('/restore', upload.single('file'), (req, res) => {
@@ -63,7 +61,17 @@ router.get('/', async (req, res) => {
 //         res.status(200).send('Base de datos restaurada correctamente');
 //     });
 // });
+
 // Ruta para restaurar la base de datos desde un archivo SQL
+// Verifica si la carpeta 'uploads' existe, si no, la crea
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Configuración de Multer para cargar archivos en la carpeta 'uploads'
+const upload = multer({ dest: uploadDir });
+
 // Ruta para restaurar la base de datos desde un archivo SQL
 router.post('/restore', upload.single('file'), async (req, res) => {
     try {
@@ -73,7 +81,7 @@ router.post('/restore', upload.single('file'), async (req, res) => {
         }
 
         // Ruta completa al archivo SQL que fue subido
-        const backupFilePath = path.join(__dirname, 'uploads', req.file.filename);
+        const backupFilePath = path.join(uploadDir, req.file.filename);
 
         // Crear una instancia de Importer con los detalles de conexión
         const importer = new Importer({
