@@ -33,6 +33,10 @@ router.get('/', async (req, res) => {
                 port: DB_PORT
             },
             dumpToFile: backupFile,
+            dump: {
+                // Añadir la opción para eliminar las tablas antes de recrearlas
+                addDropTable: true,  // Incluye DROP TABLE en el respaldo
+            }
         });
 
         res.download(backupFile); // Envía el archivo para que se descargue en el frontend
