@@ -7,6 +7,7 @@ const csv = require('csv-parser');
 const fs = require('fs');
 const { exec } = require('child_process');
 const path = require('path');
+const Importer = require('mysql-import');
 const { DB_HOST, DB_USER, DB_NAME, DB_PASSWORD, DB_PORT } = require('../config');
 require('dotenv').config();
 // Configurar multer para manejar el archivo de respaldo
@@ -46,21 +47,43 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Ruta para restaurar la base de datos
-router.post('/restore', upload.single('file'), (req, res) => {
-    const backupFilePath = req.file.path;
+// // Ruta para restaurar la base de datos
+// router.post('/restore', upload.single('file'), (req, res) => {
+//     const backupFilePath = req.file.path;
 
-    // Comando para restaurar la base de datos usando el archivo .sql
-    const restoreCommand = `mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} ${DB_NAME} < ${backupFilePath}`;
+//     // Comando para restaurar la base de datos usando el archivo .sql
+//     const restoreCommand = `mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} ${DB_NAME} < ${backupFilePath}`;
 
-    exec(restoreCommand, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Error al restaurar la base de datos: ${error}`);
-            return res.status(500).send('Error al restaurar la base de datos');
-        }
-        console.log(`Base de datos restaurada con éxito: ${stdout}`);
-        res.status(200).send('Base de datos restaurada correctamente');
-    });
+//     exec(restoreCommand, (error, stdout, stderr) => {
+//         if (error) {
+//             console.error(`Error al restaurar la base de datos: ${error}`);
+//             return res.status(500).send('Error al restaurar la base de datos');
+//         }
+//         console.log(`Base de datos restaurada con éxito: ${stdout}`);
+//         res.status(200).send('Base de datos restaurada correctamente');
+//     });
+// });
+// Ruta para restaurar la base de datos desde un archivo SQL
+router.post('/restore', async (req, res) => {
+    try {
+        const backupFilePath = path.join(__dirname, 'uploads', req.file.filename); // Archivo subido
+
+        const importer = new Importer({
+            host: DB_HOST,
+            user: DB_USER,
+            password: DB_PASSWORD,
+            database: DB_NAME,
+            port: DB_PORT
+        });
+
+        // Cargar el archivo SQL y restaurar la base de datos
+        await importer.import(backupFilePath);
+
+        res.status(200).send('Base de datos restaurada exitosamente');
+    } catch (err) {
+        console.error('Error al restaurar la base de datos:', err);
+        res.status(500).send('Error al restaurar la base de datos');
+    }
 });
 
 
