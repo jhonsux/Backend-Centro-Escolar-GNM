@@ -64,10 +64,18 @@ router.get('/', async (req, res) => {
 //     });
 // });
 // Ruta para restaurar la base de datos desde un archivo SQL
-router.post('/restore', async (req, res) => {
+// Ruta para restaurar la base de datos desde un archivo SQL
+router.post('/restore', upload.single('file'), async (req, res) => {
     try {
-        const backupFilePath = path.join(__dirname, 'uploads', req.file.filename); // Archivo subido
+        // Verifica si se ha subido el archivo
+        if (!req.file) {
+            return res.status(400).send('No se ha subido ningún archivo');
+        }
 
+        // Ruta completa al archivo SQL que fue subido
+        const backupFilePath = path.join(__dirname, 'uploads', req.file.filename);
+
+        // Crear una instancia de Importer con los detalles de conexión
         const importer = new Importer({
             host: DB_HOST,
             user: DB_USER,
@@ -76,8 +84,11 @@ router.post('/restore', async (req, res) => {
             port: DB_PORT
         });
 
-        // Cargar el archivo SQL y restaurar la base de datos
+        // Cargar e importar el archivo SQL
         await importer.import(backupFilePath);
+
+        // Eliminar el archivo después de la importación (opcional)
+        fs.unlinkSync(backupFilePath);
 
         res.status(200).send('Base de datos restaurada exitosamente');
     } catch (err) {
