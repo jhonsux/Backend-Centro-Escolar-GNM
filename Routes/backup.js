@@ -9,6 +9,9 @@ const { exec } = require('child_process');
 const path = require('path');
 const { DB_HOST, DB_USER, DB_NAME, DB_PASSWORD, DB_PORT } = require('../config');
 require('dotenv').config();
+// Configurar multer para manejar el archivo de respaldo
+const upload = multer({ dest: 'uploads/' });
+
 
 // Ruta para realizar copias de seguridad de la DB
 router.get('/', async (req, res) => {
@@ -39,8 +42,6 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Configurar multer para manejar el archivo de respaldo
-//const upload = multer({ dest: 'uploads/' });
 // Ruta para restaurar la base de datos
 router.post('/restore', upload.single('file'), (req, res) => {
     const backupFilePath = req.file.path;
@@ -60,7 +61,7 @@ router.post('/restore', upload.single('file'), (req, res) => {
 
 
 // subir datos a tabla alumnos
-const upload = multer({ dest: 'uploads/' });
+//const upload = multer({ dest: 'uploads/' });
 router.post('/upload', upload.single('file'), (req, res) => {
     const filePath = req.file.path;
     const results = [];
