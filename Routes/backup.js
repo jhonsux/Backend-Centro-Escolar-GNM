@@ -33,7 +33,7 @@ router.get('/', async (req, res) => {
             dumpToFile: backupFile,
             dump: {
                 addDropTable: true,  // Incluye DROP TABLE antes de cada CREATE TABLE
-                completeInsert: true  // Incluye nombres de columnas en los INSERT
+                // completeInsert: true  // Incluye nombres de columnas en los INSERT
             }
         });
 
