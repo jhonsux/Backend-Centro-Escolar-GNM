@@ -75,25 +75,35 @@ const upload = multer({ dest: uploadDir });
 // Ruta para restaurar la base de datos desde un archivo SQL
 router.post('/restore', upload.single('file'), async (req, res) => {
     try {
-        const filePath = req.file.path;
+        // Verifica si se ha subido el archivo
+        if (!req.file) {
+            return res.status(400).json({ message: 'Error al restaurar la base de datos', error });
+        }
 
-        // Comando para restaurar la base de datos
-        const command = `mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} ${DB_NAME} < ${filePath}`;
-        exec(command, (error, stdout, stderr) => {
-            if (error) {
-                console.error('Error al restaurar la base de datos:', error);
-                return res.status(500).json({ message: 'Error al restaurar la base de datos', error });
-            }
-            console.log('Base de datos restaurada exitosamente');
-            return res.status(200).json({ message: 'Base de datos restaurada exitosamente' }); // JSON en lugar de texto plano
+        // Ruta completa al archivo SQL que fue subido
+        const backupFilePath = path.join(uploadDir, req.file.filename);
+
+        // Crear una instancia de Importer con los detalles de conexión
+        const importer = new Importer({
+            host: DB_HOST,
+            user: DB_USER,
+            password: DB_PASSWORD,
+            database: DB_NAME,
+            port: DB_PORT
         });
+
+        // Cargar e importar el archivo SQL
+        await importer.import(backupFilePath);
+
+        // Eliminar el archivo después de la importación (opcional)
+        fs.unlinkSync(backupFilePath);
+
+        res.status(200).json({ message: 'Base de datos restaurada exitosamente' }); // JSON en lugar de texto plano
     } catch (err) {
-        console.error('Error al procesar el archivo:', err);
-        return res.status(500).json({ message: 'Error al procesar el archivo', error: err });
+        console.error('Error al restaurar la base de datos:', err);
+        res.status(500).json({ message: 'Error al procesar el archivo', error: err });
     }
 });
-
-
 
 // subir datos a tabla alumnos
 //const upload = multer({ dest: 'uploads/' });
