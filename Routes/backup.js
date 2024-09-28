@@ -111,6 +111,11 @@ router.post('/upload', upload.single('file'), (req, res) => {
     const filePath = req.file.path;
     const results = [];
 
+    // Verifica si se ha subido el archivo
+    if (!req.file) {
+        return res.status(400).json({ message: 'Error al restaurar la base de datos', error });
+    }
+
     fs.createReadStream(filePath)
   .pipe(csv())
   .on('data', (row) => {
@@ -151,6 +156,11 @@ router.post('/upload', upload.single('file'), (req, res) => {
 //const upload = multer({ dest: 'uploads/' });
 router.post('/upload-tutores', upload.single('file'), (req, res) => {
     const filePath = req.file.path;
+
+    // Verifica si se ha subido el archivo
+    if (!req.file) {
+        return res.status(400).json({ message: 'Error al restaurar la base de datos', error });
+    }
 
     fs.createReadStream(filePath)
         .pipe(csv())
