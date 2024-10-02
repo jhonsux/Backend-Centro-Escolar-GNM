@@ -44,51 +44,47 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Verifica si la carpeta 'uploads' existe, si no, la crea
+// Configuración de Multer para cargar archivos en la carpeta 'uploads'
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Configuración de Multer para cargar archivos en la carpeta 'uploads'
 const upload = multer({ dest: uploadDir });
 
 // Ruta para restaurar la base de datos desde un archivo SQL
 router.post('/restore', upload.single('file'), async (req, res) => {
     try {
-        // Verifica si se ha subido el archivo
         if (!req.file) {
-            return res.status(400).json({ message: 'Error al restaurar la base de datos', error });
+            return res.status(400).json({ message: 'No se ha subido ningún archivo.' });
         }
 
-        // Ruta completa al archivo SQL que fue subido
         const backupFilePath = path.join(uploadDir, req.file.filename);
 
-        // Crear una instancia de Importer con los detalles de conexión
-        const importer = new Importer({
-            host: DB_HOST,
-            user: DB_USER,
-            password: DB_PASSWORD,
-            database: DB_NAME,
-            port: DB_PORT
+        // Construir el comando para restaurar la base de datos usando MySQL CLI
+        const command = `mysql --host=${DB_HOST} --user=${DB_USER} --password=${DB_PASSWORD} --port=${DB_PORT} ${DB_NAME} < ${backupFilePath}`;
+
+        // Ejecutar el comando
+        exec(command, (error, stdout, stderr) => {
+            // Manejar errores de ejecución
+            if (error) {
+                console.error(`Error al ejecutar el comando: ${error.message}`);
+                return res.status(500).json({ message: 'Error al restaurar la base de datos', error: error.message });
+            }
+
+            if (stderr) {
+                console.error(`Error en la restauración: ${stderr}`);
+                return res.status(500).json({ message: 'Error en la restauración de la base de datos', error: stderr });
+            }
+
+            // Eliminar el archivo después de la importación (opcional)
+            fs.unlinkSync(backupFilePath);
+
+            res.status(200).json({ message: 'Base de datos restaurada exitosamente' });
         });
-
-        // Cargar e importar el archivo SQL
-        await importer.onProgress(progress => {
-            console.log(`Progress: ${progress.fileName}, ${progress.progress}%`);
-        }).import(backupFilePath);
-        
-if (fs.existsSync(backupFilePath)) {
-    console.log('El archivo existe antes de ser eliminado');
-}
-
-        // Eliminar el archivo después de la importación (opcional)
-        fs.unlinkSync(backupFilePath);
-
-        res.status(200).json({ message: 'Base de datos restaurada exitosamente' }); // JSON en lugar de texto plano
     } catch (err) {
+        console.error('Error al restaurar la base de datos:', err);
         res.status(500).json({ message: 'Error al procesar el archivo', error: err.message });
-        console.error('Detalles del error:', err);
     }
 });
 
