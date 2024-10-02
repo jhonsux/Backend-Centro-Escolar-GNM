@@ -7,7 +7,7 @@ const csv = require('csv-parser');
 const fs = require('fs');
 const { exec } = require('child_process');
 const path = require('path');
-const { Importer } = require('mysql-import');
+const Importer = require('mysql-import');
 const { DB_HOST, DB_USER, DB_NAME, DB_PASSWORD, DB_PORT } = require('../config');
 require('dotenv').config();
 
