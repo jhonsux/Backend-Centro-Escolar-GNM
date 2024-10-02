@@ -44,25 +44,6 @@ router.get('/', async (req, res) => {
     }
 });
 
-
-// // Ruta para restaurar la base de datos
-// router.post('/restore', upload.single('file'), (req, res) => {
-//     const backupFilePath = req.file.path;
-
-//     // Comando para restaurar la base de datos usando el archivo .sql
-//     const restoreCommand = `mysql -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} ${DB_NAME} < ${backupFilePath}`;
-
-//     exec(restoreCommand, (error, stdout, stderr) => {
-//         if (error) {
-//             console.error(`Error al restaurar la base de datos: ${error}`);
-//             return res.status(500).send('Error al restaurar la base de datos');
-//         }
-//         console.log(`Base de datos restaurada con éxito: ${stdout}`);
-//         res.status(200).send('Base de datos restaurada correctamente');
-//     });
-// });
-
-// Ruta para restaurar la base de datos desde un archivo SQL
 // Verifica si la carpeta 'uploads' existe, si no, la crea
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
@@ -93,15 +74,21 @@ router.post('/restore', upload.single('file'), async (req, res) => {
         });
 
         // Cargar e importar el archivo SQL
-        await importer.import(backupFilePath);
-
+        await importer.onProgress(progress => {
+            console.log(`Progress: ${progress.fileName}, ${progress.progress}%`);
+        }).import(backupFilePath);
+        
+        if (fs.existsSync(backupFilePath)) {
+            console.log('El archivo existe antes de ser eliminado');
+        }
+        
         // Eliminar el archivo después de la importación (opcional)
         fs.unlinkSync(backupFilePath);
 
         res.status(200).json({ message: 'Base de datos restaurada exitosamente' }); // JSON en lugar de texto plano
     } catch (err) {
-        console.error('Error al restaurar la base de datos:', err);
-        res.status(500).json({ message: 'Error al procesar el archivo', error: err });
+        res.status(500).json({ message: 'Error al procesar el archivo', error: err.message });
+        console.error('Detalles del error:', err);
     }
 });
 
