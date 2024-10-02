@@ -52,6 +52,16 @@ if (!fs.existsSync(uploadDir)) {
 
 const upload = multer({ dest: uploadDir });
 
+// Función para limpiar el archivo SQL de comentarios y comandos no válidos
+function limpiarSQL(data) {
+    return data
+        .split('\n')
+        .filter(line => {
+            return !(line.startsWith('--') || line.startsWith('/*') || line.startsWith('*/') || line.startsWith('/*!'));
+        })
+        .join('\n');
+}
+
 // Función para ejecutar el archivo SQL
 function ejecutarSQLDesdeArchivo(filePath, connection) {
     return new Promise((resolve, reject) => {
@@ -60,8 +70,11 @@ function ejecutarSQLDesdeArchivo(filePath, connection) {
                 return reject(err);
             }
 
-            // Ejecutar el archivo SQL en la base de datos
-            connection.query(data, (error, results) => {
+            // Limpiar el contenido SQL para evitar errores
+            const sqlLimpio = limpiarSQL(data);
+
+            // Ejecutar el archivo SQL limpio en la base de datos
+            connection.query(sqlLimpio, (error, results) => {
                 if (error) {
                     return reject(error);
                 }
