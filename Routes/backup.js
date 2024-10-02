@@ -52,6 +52,25 @@ if (!fs.existsSync(uploadDir)) {
 
 const upload = multer({ dest: uploadDir });
 
+// Función para ejecutar el archivo SQL
+function ejecutarSQLDesdeArchivo(filePath, connection) {
+    return new Promise((resolve, reject) => {
+        fs.readFile(filePath, 'utf8', (err, data) => {
+            if (err) {
+                return reject(err);
+            }
+
+            // Ejecutar el archivo SQL en la base de datos
+            connection.query(data, (error, results) => {
+                if (error) {
+                    return reject(error);
+                }
+                resolve(results);
+            });
+        });
+    });
+}
+
 // Ruta para restaurar la base de datos desde un archivo SQL
 router.post('/restore', upload.single('file'), async (req, res) => {
     try {
@@ -61,26 +80,24 @@ router.post('/restore', upload.single('file'), async (req, res) => {
 
         const backupFilePath = path.join(uploadDir, req.file.filename);
 
-        // Construir el comando para restaurar la base de datos usando MySQL CLI
-        const command = `mysql --host=${DB_HOST} --user=${DB_USER} --password=${DB_PASSWORD} --port=${DB_PORT} ${DB_NAME} < ${backupFilePath}`;
-
-        // Ejecutar el comando
-        exec(command, (error, stdout, stderr) => {
-            // Manejar errores de ejecución
-            if (error) {
-                console.error(`Error al ejecutar el comando: ${error.message}`);
-                return res.status(500).json({ message: 'Error al restaurar la base de datos', error: error.message });
+        // Obtener conexión del pool
+        pool.getConnection(async (err, connection) => {
+            if (err) {
+                console.error('Error al obtener la conexión:', err);
+                return res.status(500).json({ message: 'Error al conectar con la base de datos' });
             }
 
-            if (stderr) {
-                console.error(`Error en la restauración: ${stderr}`);
-                return res.status(500).json({ message: 'Error en la restauración de la base de datos', error: stderr });
+            try {
+                // Ejecutar el archivo SQL
+                await ejecutarSQLDesdeArchivo(backupFilePath, connection);
+                fs.unlinkSync(backupFilePath); // Eliminar el archivo después de la importación
+                res.status(200).json({ message: 'Base de datos restaurada exitosamente' });
+            } catch (error) {
+                console.error('Error al ejecutar el archivo SQL:', error);
+                res.status(500).json({ message: 'Error al restaurar la base de datos', error: error.message });
+            } finally {
+                connection.release(); // Liberar la conexión de vuelta al pool
             }
-
-            // Eliminar el archivo después de la importación (opcional)
-            fs.unlinkSync(backupFilePath);
-
-            res.status(200).json({ message: 'Base de datos restaurada exitosamente' });
         });
     } catch (err) {
         console.error('Error al restaurar la base de datos:', err);
@@ -133,7 +150,6 @@ router.post('/upload', upload.single('file'), (req, res) => {
     res.status(201).json({ message: 'Datos agregados correctamente desde CSV' });
   });
 });
-
 
 // Ruta para subir datos a la tabla Tutores
 //const upload = multer({ dest: 'uploads/' });
