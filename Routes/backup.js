@@ -12,37 +12,31 @@ const { DB_HOST, DB_USER, DB_NAME, DB_PASSWORD, DB_PORT } = require('../config')
 require('dotenv').config();
 
 // Ruta para realizar copias de seguridad de la DB
-router.get('/', async (req, res) => {
+router.post('/', async (req, res) => {
     try {
-        const path = 'C:/backups';
-        if (!fs.existsSync(path)) {
-            fs.mkdirSync(path, { recursive: true });
+        const backupFilePath = path.join(__dirname, 'backups', `backup-${Date.now()}.sql`);
+
+        // Crea la carpeta si no existe
+        if (!fs.existsSync(path.join(__dirname, 'backups'))) {
+            fs.mkdirSync(path.join(__dirname, 'backups'), { recursive: true });
         }
 
-        const backupFile = `${path}/backup_${Date.now()}.sql`;
-
-        // Realiza la copia de seguridad con mysqldump
-        await mysqldump({
-            connection: {
-                host: DB_HOST, 
-                user: DB_USER,
-                password: DB_PASSWORD,
-                database: DB_NAME,
-                port: DB_PORT
-            },
-            dumpToFile: backupFile,
-            dump: {
-                addDropTable: true,  // Incluye DROP TABLE antes de cada CREATE TABLE
-                // completeInsert: true  // Incluye nombres de columnas en los INSERT
+        // Ejecutar mysqldump
+        exec(`mysqldump -u${DB_USER} -p${DB_PASSWORD} -h${DB_HOST} --port=${DB_PORT} ${DB_NAME} > ${backupFilePath}`, (err, stdout, stderr) => {
+            if (err) {
+                console.error('Error al crear el backup:', err);
+                return res.status(500).json({ message: 'Error al crear el backup', error: err.message });
             }
-        });
 
-        res.download(backupFile); // Envía el archivo para que se descargue en el frontend
-    } catch (err) {
-        console.error('Error al generar la copia de seguridad:', err);
-        res.status(500).send('Error al generar la copia de seguridad');
+            console.log('Backup creado exitosamente:', stdout);
+            res.status(200).json({ message: 'Backup creado exitosamente', filePath: backupFilePath });
+        });
+    } catch (error) {
+        console.error('Error al crear el backup:', error);
+        res.status(500).json({ message: 'Error al crear el backup', error: error.message });
     }
 });
+
 
 // Configuración de Multer para cargar archivos en la carpeta 'uploads'
 const uploadDir = path.join(__dirname, 'uploads');
