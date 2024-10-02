@@ -7,7 +7,7 @@ const csv = require('csv-parser');
 const fs = require('fs');
 const { exec } = require('child_process');
 const path = require('path');
-const Importer = require('mysql-import');
+const { Importer } = require('mysql-import');
 const { DB_HOST, DB_USER, DB_NAME, DB_PASSWORD, DB_PORT } = require('../config');
 require('dotenv').config();
 
@@ -78,10 +78,10 @@ router.post('/restore', upload.single('file'), async (req, res) => {
             console.log(`Progress: ${progress.fileName}, ${progress.progress}%`);
         }).import(backupFilePath);
         
-        if (fs.existsSync(backupFilePath)) {
-            console.log('El archivo existe antes de ser eliminado');
-        }
-        
+if (fs.existsSync(backupFilePath)) {
+    console.log('El archivo existe antes de ser eliminado');
+}
+
         // Eliminar el archivo después de la importación (opcional)
         fs.unlinkSync(backupFilePath);
 
