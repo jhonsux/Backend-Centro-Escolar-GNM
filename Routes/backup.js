@@ -10,7 +10,7 @@ const { DB_HOST, DB_USER, DB_NAME, DB_PASSWORD, DB_PORT } = require('../config')
 require('dotenv').config();
 
 // Ruta para realizar copias de seguridad de la DB
-app.get('/', (req, res) => {
+router.get('/', (req, res) => {
     // Nombre del archivo de la copia de seguridad con timestamp
     const backupFile = path.join(__dirname, `backup_${DB_NAME}_${Date.now()}.sql`);
 
@@ -50,7 +50,7 @@ if (!fs.existsSync(uploadDir)) {
 const upload = multer({ dest: 'uploads/' });
 
 // Ruta para restaurar la base de datos desde un archivo SQL subido
-app.post('/restore', upload.single('backup'), (req, res) => {
+router.post('/restore', upload.single('backup'), (req, res) => {
     const backupFile = req.file.path; // Ruta temporal del archivo subido
 
     const importer = mysqlImport.config({
