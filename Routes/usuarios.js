@@ -7,7 +7,7 @@ const pool = require('../db');
 require('dotenv').config();
 
 // Ruta para consultar todos los usuarios
-router.get('/usuarios', (req, res) => {
+router.get('/', (req, res) => {
 
     const query = `SELECT * 
     FROM Usuarios
@@ -24,7 +24,7 @@ router.get('/usuarios', (req, res) => {
 });
 
 // Ruta para consultar Usuario con ID
-router.get('/usuarios/:id', (req, res) => {
+router.get('/:id', (req, res) => {
     const { id } = req.params;
 
     // Query para seleccionar el usuario por ID, usando parámetros preparados para evitar inyección SQL
@@ -47,7 +47,7 @@ router.get('/usuarios/:id', (req, res) => {
 });
 
 // Ruta para actualizar un usuario por ID
-router.put('/usuarios/actualizar/:id', async (req, res) => {
+router.put('/actualizar/:id', async (req, res) => {
     const { name, firstname, lastname, email, password, user_types } = req.body;
     const { id } = req.params;
 
@@ -87,7 +87,7 @@ router.put('/usuarios/actualizar/:id', async (req, res) => {
 });
 
 // Ruta para eliminar un usuario por ID
-router.delete('/usuarios/:id', verifyToken, (req, res) => {
+router.delete('/:id', verifyToken, (req, res) => {
     const { id } = req.params;
 
     const query = `DELETE FROM Usuarios WHERE user_id = ?`;

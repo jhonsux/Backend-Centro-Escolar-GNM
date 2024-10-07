@@ -5,12 +5,12 @@ const connection = require('../db');
 const pool = require('../db');
 
 // Ruta para obtener los registros de reportes
-router.get('/reportes', verifyToken, (req, res) => {
+router.get('/', verifyToken, (req, res) => {
     const query = `SELECT report_id, student_id, i.type_name AS incidencia, u.name AS user, Reportes.description, justificado, date
                    FROM Reportes
                    JOIN Incidencias AS i ON Reportes.type_id = i.type_id
                    JOIN Usuarios AS u ON Reportes.user_id = u.user_id
-                   ORDER BY justificado`;
+                   ORDER BY justificado, date`;
 
     pool.query(query, (error, results) => {
         if (error) {
@@ -23,7 +23,7 @@ router.get('/reportes', verifyToken, (req, res) => {
 
 
 // ruta para obtener registro de reporte por ID
-router.get('/reportes/:id', (req, res) => {
+router.get('/:id', (req, res) => {
     const { id } = req.params;
 
     const query = `SELECT report_id, student_id, i.type_name AS incidencia, u.name AS user, Reportes.description, justificado, date
@@ -56,7 +56,7 @@ router.get('/reportes/:id', (req, res) => {
 
 
 // ruta para crear un reporte
-router.post('/reportes/crear', verifyToken, (req, res) => {
+router.post('/crear', verifyToken, (req, res) => {
     const reporte = {
         report_id: req.body.report_id,
         student_id: req.body.student_id,
@@ -101,7 +101,7 @@ router.post('/reportes/crear', verifyToken, (req, res) => {
 
 
 // ruta para actualizar un reporte por ID
-router.put('/reportes/actualizar/:id', (req, res) => {
+router.put('/actualizar/:id', (req, res) => {
     const { id } = req.params;
     const { justificado } = req.body;
 
@@ -121,22 +121,22 @@ router.put('/reportes/actualizar/:id', (req, res) => {
 
 
 // ruta para borrar un reporte por ID
-// router.delete('/reportes/:id', (req, res) => {
+router.delete('/:id', (req, res) => {
 
-//     const { id } = req.params
+    const { id } = req.params
 
-//     const query = `DELETE FROM Reportes WHERE report_id = ${id}`
+    const query = `DELETE FROM Reportes WHERE report_id = ${id}`
 
-//     connection.query(query, (error, results) => {
-//         if (error) {
-//             console.error('Error en la consulta SQL:', error);
-//             return res.status(500).send('Error en la consulta SQL');
-//         }            
-//         res.status(201).json({
-//             message: 'Reporte se borro correctamente',
-//             data: results
-//         })
-//     });
-// })
+    connection.query(query, (error, results) => {
+        if (error) {
+            console.error('Error en la consulta SQL:', error);
+            return res.status(500).send('Error en la consulta SQL');
+        }            
+        res.status(201).json({
+            message: 'Reporte se borro correctamente',
+            data: results
+        })
+    });
+})
 
 module.exports = router;

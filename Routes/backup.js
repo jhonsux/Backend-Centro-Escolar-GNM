@@ -165,5 +165,7 @@ router.post('/upload-tutores', upload.single('file'), (req, res) => {
         });
 });
 
+// Ruta para limpiar la base de datos
+
 
 module.exports = router;

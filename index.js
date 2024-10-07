@@ -25,9 +25,9 @@ app.use(express.text()); //aprende format texto
 
 //rutas de api para consultas sql
 app.use('/alumnos',alumnosRoutes);
-app.use(tutoresRoutes);
-app.use(reportesRoutes);
-app.use(usuariosRoutes);
+app.use('/tutores',tutoresRoutes);
+app.use('/reportes',reportesRoutes);
+app.use('/usuarios',usuariosRoutes);
 app.use('/auth',authRoutes);
 app.use('/incidencias',incidenciasRoutes);
 app.use('/justificantes',justificantesRoutes);
