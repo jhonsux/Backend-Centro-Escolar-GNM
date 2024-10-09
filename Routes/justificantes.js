@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router('');
 const verifyToken = require('../middlewares/verifyToken');
-const connection = require('../db');
 const pool = require('../db');
 require('dotenv').config();
 
@@ -60,7 +59,7 @@ router.post('/crear', verifyToken, (req, res) => {
 });
 
 // Ruta para Editar un Incidencia
-router.put('/actualizar/:id', (req, res) => {
+router.put('/actualizar/:id', verifyToken, (req, res) => {
     const { id } = req.params;
     const { student_id, issue_date, description } = req.body
 

@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const verifyToken = require('../middlewares/verifyToken');
-const connection = require('../db');
 const pool = require('../db');
 
 // Ruta para obtener los registros de reportes
@@ -121,7 +120,7 @@ router.put('/actualizar/:id', (req, res) => {
 
 
 // ruta para borrar un reporte por ID
-router.delete('/:id', (req, res) => {
+router.delete('/:id', verifyToken, (req, res) => {
 
     const { id } = req.params
 

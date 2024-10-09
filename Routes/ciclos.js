@@ -1,11 +1,7 @@
 const express = require('express');
 const router = express.Router('');
 const verifyToken = require('../middlewares/verifyToken');
-const connection = require('../db');
 const pool = require('../db');
-const multer = require('multer');
-const csv = require('csv-parser');
-const fs = require('fs');
 require('dotenv').config();
 
 // Ruta para obtener todos los Ciclos
@@ -69,7 +65,7 @@ router.post('/crear-ciclo', verifyToken, (req, res) => {
 });
 
 // Ruta para Editar un Ciclo
-router.put('/actualizar/:id', (req, res) => {
+router.put('/actualizar/:id', verifyToken, (req, res) => {
     const { id } = req.params;
     const { fecha_inicio, fecha_fin  } = req.body;
 
@@ -88,7 +84,7 @@ router.put('/actualizar/:id', (req, res) => {
 });
 
 // Ruta para Borrar un Ciclo
-router.delete('/:id', (req, res) => {
+router.delete('/:id', verifyToken, (req, res) => {
 
     const { id } = req.params
 

@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router('');
 const verifyToken = require('../middlewares/verifyToken');
-const connection = require('../db');
 const pool = require('../db');
 require('dotenv').config();
 
@@ -74,7 +73,7 @@ router.put('/actualizar/:id', (req, res) => {
 });
 
 //Ruta para Borrar Incidecia
-router.delete('/:id', (req, res) => {
+router.delete('/:id', verifyToken, (req, res) => {
 
     const { id } = req.params
 

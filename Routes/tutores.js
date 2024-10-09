@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const verifyToken = require('../middlewares/verifyToken');
-const connection = require('../db');
 const pool = require('../db');
 
 // Ruta para obtener registro de tutores
@@ -162,7 +161,7 @@ router.put('/actualizar/:id', (req, res) => {
    
  
 // Ruta para borrar un registro de alumno por ID
-router.delete('/:id', (req, res) => {
+router.delete('/:id', verifyToken, (req, res) => {
     const { id } = req.params;
 
     const query = `DELETE FROM Tutores WHERE parent_id = ?`;

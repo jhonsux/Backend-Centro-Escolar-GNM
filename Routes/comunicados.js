@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router('');
 const verifyToken = require('../middlewares/verifyToken');
-const connection = require('../db');
 const pool = require('../db');
 require('dotenv').config();
 
@@ -17,7 +16,6 @@ require('dotenv').config();
         res.status(201).json(results);
     });
 });
-
 
 // Ruta para obtener un registro de alumnos por ID
 router.get('/:id', (req, res) => {
@@ -39,8 +37,7 @@ router.get('/:id', (req, res) => {
     });
 });
 
-
-  // ruta para crear un tipo de comunicado
+// Ruta para crear un tipo de comunicado
   router.post('/crear', (req, res) => {
     const comunicado = {
         communication_id: req.body.comunication_id,
