@@ -7,9 +7,9 @@ require('dotenv').config();
 
 // Ruta para obtener Incidencias
 router.get('/', verifyToken, (req, res) => {
-    const query = `SELECT reportes.report_id, Alumnos.student_id, Alumnos.name, Alumnos.firstname, Alumnos.lastname, Justificantes.issue_date, Justificantes.description
+    const query = `SELECT Reportes.report_id, Alumnos.student_id, Alumnos.name, Alumnos.firstname, Alumnos.lastname, Justificantes.issue_date, Justificantes.description
                    FROM Justificantes
-                   JOIN reportes ON Justificantes.report_id = reportes.report_id
+                   JOIN Reportes ON Justificantes.report_id = Reportes.report_id
                    JOIN Alumnos ON Justificantes.student_id = Alumnos.student_id`;
 
     pool.query(query, (error, results) => {
@@ -55,6 +55,25 @@ router.post('/crear', verifyToken, (req, res) => {
 
         res.status(201).json({
             message: 'Justificante creado correctamente'
+        });
+    });
+});
+
+// Ruta para Editar un Incidencia
+router.put('/actualizar/:id', (req, res) => {
+    const { id } = req.params;
+    const { student_id, issue_date, description } = req.body
+
+    const query = `UPDATE Justificantes SET student_id = ?, issue_date = ?, description = ? WHERE report_id = ?`;
+
+    pool.query(query, [student_id, issue_date, description, id], (error, results) => {
+        if (error) {
+            console.error('Error en la consulta SQL:', error);
+            return res.status(500).send('Error en la consulta SQL');
+        }
+        res.status(201).json({
+            message: 'Incidencia actualizado correctamente',
+            data: results
         });
     });
 });

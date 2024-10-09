@@ -68,6 +68,44 @@ router.post('/crear-ciclo', verifyToken, (req, res) => {
     });
 });
 
+// Ruta para Editar un Ciclo
+router.put('/actualizar/:id', (req, res) => {
+    const { id } = req.params;
+    const { fecha_inicio, fecha_fin  } = req.body;
+
+    const query = `UPDATE Ciclos SET fecha_inicio = ?, fecha_fin = ? WHERE cicle_id = ?`;
+
+    pool.query(query, [fecha_inicio, fecha_fin, id], (error, results) => {
+        if (error) {
+            console.error('Error en la consulta SQL:', error);
+            return res.status(500).send('Error en la consulta SQL');
+        }
+        res.status(201).json({
+            message: 'Ciclo actualizado correctamente',
+            data: results
+        });
+    });
+});
+
+// Ruta para Borrar un Ciclo
+router.delete('/:id', (req, res) => {
+
+    const { id } = req.params
+
+    const query = `DELETE FROM Ciclos WHERE cicle_id = ${id}`
+
+    pool.query(query, (error, results) => {
+        if (error) {
+            console.error('Error en la consulta SQL:', error);
+            return res.status(500).send('Error en la consulta SQL');
+        }            
+        res.status(201).json({
+            message: 'Ciclo se borro correctamente',
+            data: results
+        })
+    });
+})
+
 // buscar ciclo escolar por id
 router.get('/:id', verifyToken, (req, res) => {
     const id = req.params.id;

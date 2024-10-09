@@ -79,5 +79,43 @@ router.get('/:id', (req, res) => {
     });
 });
 
+// Ruta para Editar Comincado
+router.put('/actualizar/:id', (req, res) => {
+    const { id } = req.params;
+    const { parent_id, date, method, description } = req.body
+
+    const query = `UPDATE Comunicados SET parent_id = ?, date = ?, method = ?, description = ? WHERE communication_id = ?`;
+
+    pool.query(query, [parent_id, date, method, description, id], (error, results) => {
+        if (error) {
+            console.error('Error en la consulta SQL:', error);
+            return res.status(500).send('Error en la consulta SQL');
+        }
+        res.status(201).json({
+            message: 'Comunicado actualizado correctamente',
+            data: results
+        });
+    });
+}); 
+
+// Ruta para Borrar un comunicado
+router.delete('/:id', (req, res) => {
+
+    const { id } = req.params
+
+    const query = `DELETE FROM Comunicado WHERE comunication_id = ${id}`
+
+    pool.query(query, (error, results) => {
+        if (error) {
+            console.error('Error en la consulta SQL:', error);
+            return res.status(500).send('Error en la consulta SQL');
+        }            
+        res.status(201).json({
+            message: 'Comunicado se borro correctamente',
+            data: results
+        })
+    });
+})
+
 
 module.exports = router;

@@ -5,7 +5,7 @@ const connection = require('../db');
 const pool = require('../db');
 require('dotenv').config();
 
-// Ruta para buscar incidencias
+// Ruta para buscar Incidencias
 router.get('/buscar', (req, res) => {
     const query = req.query.query;
     const sql = `SELECT * FROM Incidencias WHERE type_id LIKE ? OR type_name LIKE ?`;
@@ -26,8 +26,7 @@ router.get('/buscar', (req, res) => {
     });
 });
 
-
-// Ruta para crear un tipo de incidencia
+// Ruta para crear un tipo de Incidencia
   router.post('/crear', (req, res) => {
     const incidencia = {
         type_id: req.body.type_id,
@@ -55,6 +54,42 @@ router.get('/buscar', (req, res) => {
     });
 });
 
+// Ruta para Editar Incidencia
+router.put('/actualizar/:id', (req, res) => {
+    const { id } = req.params;
+    const { type_name, description} = req.body
 
+    const query = `UPDATE Incidencias SET type_name = ?, description = ? WHERE report_id = ?`;
+
+    pool.query(query, [type_name, description, id], (error, results) => {
+        if (error) {
+            console.error('Error en la consulta SQL:', error);
+            return res.status(500).send('Error en la consulta SQL');
+        }
+        res.status(201).json({
+            message: 'Incidencia actualizado correctamente',
+            data: results
+        });
+    });
+});
+
+//Ruta para Borrar Incidecia
+router.delete('/:id', (req, res) => {
+
+    const { id } = req.params
+
+    const query = `DELETE FROM Incidencias WHERE type_id = ${id}`
+
+    pool.query(query, (error, results) => {
+        if (error) {
+            console.error('Error en la consulta SQL:', error);
+            return res.status(500).send('Error en la consulta SQL');
+        }            
+        res.status(201).json({
+            message: 'Incidencia se borro correctamente',
+            data: results
+        })
+    });
+})
 
   module.exports = router;

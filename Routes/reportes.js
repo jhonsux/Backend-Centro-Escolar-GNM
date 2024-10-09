@@ -127,7 +127,7 @@ router.delete('/:id', (req, res) => {
 
     const query = `DELETE FROM Reportes WHERE report_id = ${id}`
 
-    connection.query(query, (error, results) => {
+    pool.query(query, (error, results) => {
         if (error) {
             console.error('Error en la consulta SQL:', error);
             return res.status(500).send('Error en la consulta SQL');
