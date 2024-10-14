@@ -100,7 +100,7 @@ router.delete('/:id', (req, res) => {
 
     const { id } = req.params
 
-    const query = `DELETE FROM Comunicado WHERE comunication_id = ${id}`
+    const query = `DELETE FROM Comunicados WHERE communication_id = ${id}`
 
     pool.query(query, (error, results) => {
         if (error) {
