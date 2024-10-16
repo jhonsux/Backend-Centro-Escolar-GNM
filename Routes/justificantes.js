@@ -77,5 +77,24 @@ router.put('/actualizar/:id', verifyToken, (req, res) => {
     });
 });
 
+// Ruta para Borrar un comunicado
+router.delete('/:id', (req, res) => {
+
+    const { id } = req.params
+
+    const query = `DELETE FROM Justificantes WHERE justification_id = ${id}`
+
+    pool.query(query, (error, results) => {
+        if (error) {
+            console.error('Error en la consulta SQL:', error);
+            return res.status(500).send('Error en la consulta SQL');
+        }            
+        res.status(201).json({
+            message: 'Justificante se borro correctamente',
+            data: results
+        })
+    });
+})
+
 
 module.exports = router;
