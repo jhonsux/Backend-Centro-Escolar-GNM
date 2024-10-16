@@ -6,7 +6,7 @@ require('dotenv').config();
 
 // Ruta para obtener Incidencias
 router.get('/', verifyToken, (req, res) => {
-    const query = `SELECT Reportes.report_id, Alumnos.student_id, Alumnos.name, Alumnos.firstname, Alumnos.lastname, Justificantes.issue_date, Justificantes.description
+    const query = `SELECT Reportes.report_id, Alumnos.student_id, Alumnos.name, Alumnos.firstname, Alumnos.lastname, Justificantes.justification_id, Justificantes.issue_date, Justificantes.description
                    FROM Justificantes
                    JOIN Reportes ON Justificantes.report_id = Reportes.report_id
                    JOIN Alumnos ON Justificantes.student_id = Alumnos.student_id`;
