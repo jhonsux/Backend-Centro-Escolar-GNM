@@ -70,11 +70,11 @@ router.post('/register', async (req, res) => {
     } = req.body;
 
     
-    if (!user_id || user_id.trim() === '' || !name || name.trim() === '') {
-        return res.status(400).json({
-            message: 'Todos los campos son obligatorios y no pueden estar vacíos'
-        });
-    }
+    // if (!user_id || user_id.trim() === '' || !name || name.trim() === '') {
+    //     return res.status(400).json({
+    //         message: 'Todos los campos son obligatorios y no pueden estar vacíos'
+    //     });
+    // }
 
     if (!email || !password) {
         return res.status(400).json({ message: 'Por favor, proporcione un correo válido y una contraseña' });
