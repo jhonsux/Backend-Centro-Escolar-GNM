@@ -4,6 +4,19 @@ const verifyToken = require('../middlewares/verifyToken');
 const pool = require('../db');
 require('dotenv').config();
 
+ // ruta para ver los datos del comunicado
+ router.get('/', (req, res) => {
+    const query = `SELECT * FROM Incidencias`;
+
+    pool.query(query, (error, results) => {
+        if (error) {
+            console.error('Error en la consulta SQL:', error);
+            return res.status(500).send('Error en la consulta SQL');
+        }
+        res.status(201).json(results);
+    });
+});
+
 // Ruta para buscar Incidencias
 router.get('/buscar', (req, res) => {
     const query = req.query.query;
