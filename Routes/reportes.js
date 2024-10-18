@@ -5,11 +5,12 @@ const pool = require('../db');
 
 // Ruta para obtener los registros de reportes
 router.get('/', verifyToken, (req, res) => {
-    const query = `SELECT report_id, student_id, i.type_name AS incidencia, u.name AS user, Reportes.description, justificado, date
-                   FROM Reportes
-                   JOIN Incidencias AS i ON Reportes.type_id = i.type_id
-                   JOIN Usuarios AS u ON Reportes.user_id = u.user_id
-                   ORDER BY justificado, date`;
+    const query = `SELECT report_id, a.student_id, a.name, a.firstname, a.lastname, i.type_name AS incidencia, u.name AS user, Reportes.description, justificado, date
+                    FROM Reportes
+                    JOIN Alumnos As a ON Reportes.student_id = a.student_id
+                    JOIN Incidencias AS i ON Reportes.type_id = i.type_id
+                    JOIN Usuarios AS u ON Reportes.user_id = u.user_id
+                    ORDER BY justificado, report_id, date`;
 
     pool.query(query, (error, results) => {
         if (error) {
